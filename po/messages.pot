@@ -1,0 +1,50 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2019 Guillaume Ricard
+# This file is distributed under the same license as the eneladim package.
+# Guillaume Ricard <guillaume.ricard@mail.com>, 2019.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-10-06 14:28+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: joueur.py:30
+msgid "❤︎ Vie {}/{} "
+msgstr ""
+
+#: joueur.py:32
+msgid " ❇︎ Mana {}/{} "
+msgstr ""
+
+#: joueur.py:34
+msgid " $ Or {} "
+msgstr ""
+
+#: joueur.py:42
+msgid " < ^ v > déplacement | a attaque | b parade | p ramasser"
+msgstr ""
+
+#: main.py:13
+msgid ""
+"Bienvenue, aventurier !\n"
+"Vous avez parcouru un long chemin pour arriver ici en quête de gloire.\n"
+"Vous entrez maintenant dans les donjons d'Eneladim.\n"
+"\n"
+"Pourrez vous faire face aux fléaux de cet endroit?\n"
+"\n"
+"Appuyez sur Échap. pour quitter.\n"
+"Appuyez sur une autre touche pour continuer."
+msgstr ""
+
+#: main.py:37
+msgid "Votre terminal est trop petit!"
+msgstr ""

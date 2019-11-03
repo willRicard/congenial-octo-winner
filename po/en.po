@@ -1,0 +1,67 @@
+# Eneladim English translations
+# Copyright (C) 2019 Guillaume Ricard
+# This file is distributed under the same license as the eneladim package.
+# Guillaume Ricard <guillaume.ricard@mail.com>, 2019.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-10-15 17:21+0200\n"
+"PO-Revision-Date: 2019-10-06 14:33+0200\n"
+"Last-Translator: Guillaume Ricard <guillaume.ricard@mail.com>\n"
+"Language-Team: English <en@li.org>>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../joueur.py:63
+msgid "❤︎ Vie {}/{} "
+msgstr "❤︎ Health {}/{} "
+
+#: ../joueur.py:64
+msgid " ❇︎ Mana {}/{} "
+msgstr " ❇︎ Mana {}/{} "
+
+#: ../joueur.py:65
+msgid " $ Or {} "
+msgstr " $ Gold {} "
+
+#: ../joueur.py:76
+msgid " < ^ v > déplacement | a attaque | b parade | p ramasser"
+msgstr " < ^ v > move | a attack | b block | p pick"
+
+#: ../main.py:13
+#, fuzzy
+msgid ""
+"Bienvenue, aventurier !\n"
+"Vous avez parcouru un long chemin pour arriver ici en quête de gloire.\n"
+"Vous entrez maintenant dans les donjons d'Eneladim.\n"
+"\n"
+"Pourrez vous faire face aux fléaux de cet endroit?\n"
+"\n"
+"Appuyez sur Échap. pour quitter.\n"
+"Appuyez sur Entrée pour continuer."
+msgstr ""
+"Welcome fellow adventurer!\n"
+"You came a long way seeking glory,\n"
+"You will now enter the dungeons of Eneladim.\n"
+"\n"
+"Can you face the evils of this place?\n"
+"\n"
+"Press escape to leave the game.\n"
+"Press any other key to continue."
+
+#: ../main.py:37
+msgid "Votre terminal est trop petit !"
+msgstr "Your terminal is too small!"
+
+#: ../main.py:75
+msgid "Les miasmes du donjon vous ont empoisonné !"
+msgstr "The dungeon's miasma poisoned you!"
+
+#: ../main.py:78
+msgid "Le donjon absorbe votre énergie magique !"
+msgstr "The dungeon is absorbing your mana !"
