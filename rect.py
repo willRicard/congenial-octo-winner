@@ -10,6 +10,9 @@ class Rect:
         self.w = w
         self.h = h
 
+        # précalculé car souvent utilisé
+        self.point_centre = (self.x + self.w // 2, self.y + self.h // 2)
+
     def __str__(self):
         return '({}, {}, {}, {})'.format(self.x, self.y, self.w, self.h)
 
@@ -17,7 +20,8 @@ class Rect:
         return '({}, {}, {}, {})'.format(self.x, self.y, self.w, self.h)
 
     def centre(self):
-        return (self.x + self.w // 2, self.y + self.h // 2)
+        # return (self.x + self.w // 2, self.y + self.h // 2)
+        return self.point_centre
 
     def distance(self, other):
         return abs(self.x - other.x) + abs(self.x - other.y)

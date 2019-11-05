@@ -2,14 +2,10 @@
 """ Project Python Semestre 1 """
 from random import seed, random, choice
 from gettext import gettext, bindtextdomain
-import curses
-import sys
 
 from carte import Carte
-from joueur import Joueur
-
-from config import NORTH, SOUTH, EAST, WEST, POISON, CURSE
-from util import dialog
+from joueur import Joueur, NORTH, SOUTH, EAST, WEST, POISON, CURSE
+from window import Window, dialog, VueCarte
 
 INTRO_TEXTE = gettext("Bienvenue, aventurier !\n\
 Vous avez parcouru un long chemin pour arriver ici en quête de gloire.\n\
@@ -18,32 +14,35 @@ Pourrez vous faire face aux fléaux de cet endroit?\n\n\
 Appuyez sur Échap. pour quitter.\n\
 Appuyez sur Entrée pour continuer.")
 
+PROBA_ALTERATION = 0.05
 
-def main(stdscr):
+
+def main():
     """ Point d'entrée du programme """
+    seed(0)
     bindtextdomain("messages", ".")
+
+    window = Window()
 
     # Message d'accueil
     dialog(INTRO_TEXTE)
 
     carte = Carte(64, 128)
-    #carte = Carte(100, 100)
-    #carte.generer_salles()
-    carte.generer_salles_partitionnement()
+    carte.generer_salles()
+
+    view = VueCarte(carte)
 
     # Départ dans une salle aléatoire
     depart = choice(carte.salles)
     col, lig = depart.centre()
     joueur = Joueur(lig, col)
 
-    # On centre l'écran sur le joueur
-    carte.lig_scroll = joueur.lig - curses.LINES // 2
-    carte.col_scroll = joueur.col - curses.COLS // 2
+    view.center(joueur)
 
     while True:
         # On inflige une altération d'état aléatoire au joueur
         # avec une certaine probabilité
-        if random() < 0.05:
+        if random() < PROBA_ALTERATION:
             if random() < 0.5 and not joueur.aliment & POISON:
                 joueur.aliment |= POISON
                 dialog(gettext('Les miasmes du donjon vous ont empoisonné !'))
@@ -55,36 +54,33 @@ def main(stdscr):
             dialog('Game over !')
             break
 
-        carte.affiche()
         joueur.update()
         carte.update(joueur)
-        joueur.affiche_ith(stdscr)
-        stdscr.refresh()
+        window.affiche_ith(joueur)
 
-        key = stdscr.getch()
+        view.refresh(joueur)
+        window.refresh()
 
-        if key == curses.KEY_UP and carte.case_libre(joueur.lig - 1,
-                                                     joueur.col):
+        if window.moving & NORTH and carte.case_libre(joueur.lig - 1,
+                                                      joueur.col):
             joueur.lig -= 1
             joueur.facing = NORTH
-        elif key == curses.KEY_DOWN and carte.case_libre(
+        elif window.moving & SOUTH and carte.case_libre(
                 joueur.lig + 1, joueur.col):
             joueur.lig += 1
             joueur.facing = SOUTH
-        elif key == curses.KEY_LEFT and carte.case_libre(
-                joueur.lig, joueur.col - 1):
+        if window.moving & WEST and carte.case_libre(joueur.lig,
+                                                     joueur.col - 1):
             joueur.col -= 1
-            joueur.facing = EAST
-        elif key == curses.KEY_RIGHT and carte.case_libre(
-                joueur.lig, joueur.col + 1):
-            joueur.col += 1
             joueur.facing = WEST
-        elif key == ord('a'):
+        elif window.moving & EAST and carte.case_libre(joueur.lig,
+                                                       joueur.col + 1):
+            joueur.col += 1
+            joueur.facing = EAST
+
+        if window.shooting:
             joueur.shoot(carte)
-        elif key == ord('q') or key == 27:  # Escape
-            break
 
 
 if __name__ == "__main__":
-    # seed(0)
-    curses.wrapper(main)
+    main()
