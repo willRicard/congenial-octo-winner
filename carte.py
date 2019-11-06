@@ -12,7 +12,7 @@ PROBA_GRANDE_SALLE = 0.2
 EPAISSEUR_MUR = 1
 
 SYMBOLE_JOUEUR = '@'
-SYMBOLE_PROJECTILE = '❇︎'
+SYMBOLE_PROJECTILE = '*'
 SYMBOLE_SOL = '.'
 SYMBOLE_MUR = '#'
 SYMBOLE_MONSTRE = 'X'
@@ -135,7 +135,7 @@ class Carte:
                 projectile[1] += 1
             lig, col, direction = projectile
             if self.case_libre(lig, col):
-                self.cases[lig][col] = '❇︎'
+                self.cases[lig][col] = SYMBOLE_PROJECTILE
             else:
                 self.projectiles.remove(projectile)
 

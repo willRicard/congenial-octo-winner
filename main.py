@@ -5,7 +5,8 @@ from gettext import gettext, bindtextdomain
 
 from carte import Carte
 from joueur import Joueur, NORTH, SOUTH, EAST, WEST, POISON, CURSE
-from window import Window, dialog, VueCarte
+from gfx.window import Window, dialog
+from gfx.vue_carte import VueCarte
 
 INTRO_TEXTE = gettext("Bienvenue, aventurier !\n\
 Vous avez parcouru un long chemin pour arriver ici en quête de gloire.\n\
