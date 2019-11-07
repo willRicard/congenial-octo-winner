@@ -3,8 +3,7 @@
 import curses
 from gettext import gettext
 
-from carte import SYMBOLE_MUR, SYMBOLE_PROJECTILE
-from joueur import NORTH, SOUTH, WEST, EAST, POISON, CURSE
+from joueur import NORTH, SOUTH, WEST, EAST
 
 
 class Window:
@@ -26,15 +25,15 @@ class Window:
         curses.init_pair(6, curses.COLOR_MAGENTA,
                          curses.COLOR_GREEN)  # Poison & maudit
 
-        self.ith = ITH()
-
         self.moving = 0
         self.shooting = False
 
+    def close():
+        """ Restaure le comportement par défaut du terminal """
+        curses.endwin()
+
     def refresh(self):
         """ Gestion des événements """
-        self.scr.refresh()
-
         key = self.scr.getch()
 
         self.moving = 0

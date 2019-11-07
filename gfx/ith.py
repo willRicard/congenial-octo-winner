@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
+""" Affichage tête-haute """
 
-ITH_FIELDS = ["❤︎ Vie", "❇︎ Mana", "$ Or"]
+import curses
+
+from gettext import gettext
+
+ITH_FIELDS = ["❤︎ Vie", "* Mana", "$ Or"]
 ITH_NUMBER_FIELD_LENGTH = 7  # 2*3 chiffres + 1 slash
 
 
@@ -13,11 +18,16 @@ class ITH:
         col = 0
         for i, field in enumerate(ITH_FIELDS):
             col += len(gettext(field))
-            self.ith.addstr(0, col, gettext(field), curses.color_pair(i + 1) | curses.A_BOLD)
-            self.ith_cols.append(cols)
+            self.win.addstr(0, col, gettext(field), curses.color_pair(i + 1) | curses.A_BOLD)
+            self.ith_cols.append(col)
             col += ITH_NUMBER_FIELD_LENGTH
 
-    def affiche(self, joueur):
+        self.win.addstr(
+            0, self.ith_cols[-1],
+            gettext(
+                ' < ^ v > déplacement | a attaque | b parade | p ramasser'))
+
+    def refresh(self, joueur):
         for i, ch in enumerate([
                 str(joueur.vie) + '/' + str(joueur.max_vie),
                 str(joueur.mana) + '/' + str(joueur.max_mana),
@@ -25,9 +35,5 @@ class ITH:
         ]):
             self.win.addstr(0, self.ith_cols[i], ch, curses.color_pair(i + 1) | curses.A_BOLD)
 
-        self.win.addstr(
-            0, self.ith_cols[-1],
-            gettext(
-                ' < ^ v > déplacement | a attaque | b parade | p ramasser'))
 
-        self.ith.refresh()
+        self.win.refresh()

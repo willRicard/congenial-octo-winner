@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 """ Project Python Semestre 1 """
-from random import seed, random, choice
+from random import seed, random
 from gettext import gettext, bindtextdomain
 
 from carte import Carte
 from joueur import Joueur, NORTH, SOUTH, EAST, WEST, POISON, CURSE
+
 from gfx.window import Window, dialog
 from gfx.vue_carte import VueCarte
+from gfx.ith import ITH
 
 INTRO_TEXTE = gettext("Bienvenue, aventurier !\n\
 Vous avez parcouru un long chemin pour arriver ici en quête de gloire.\n\
@@ -20,7 +22,7 @@ PROBA_ALTERATION = 0.05
 
 def main():
     """ Point d'entrée du programme """
-    seed(0)
+    # seed(0)
     bindtextdomain("messages", ".")
 
     window = Window()
@@ -34,9 +36,10 @@ def main():
     view = VueCarte(carte)
 
     # Départ dans une salle aléatoire
-    depart = choice(carte.salles)
+    depart = carte.salles[0]
     col, lig = depart.centre()
     joueur = Joueur(lig, col)
+    ith = ITH()
 
     view.center(joueur)
 
@@ -57,9 +60,9 @@ def main():
 
         joueur.update()
         carte.update(joueur)
-        window.affiche_ith(joueur)
 
         view.refresh(joueur)
+        ith.refresh(joueur)
         window.refresh()
 
         if window.moving & NORTH and carte.case_libre(joueur.lig - 1,
@@ -81,6 +84,8 @@ def main():
 
         if window.shooting:
             joueur.shoot(carte)
+
+    window.close()
 
 
 if __name__ == "__main__":
