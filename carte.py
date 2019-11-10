@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """ Tableau 2D de caractères """
 from random import random, randrange, choice
@@ -89,8 +88,12 @@ class Carte:
             else:
                 self.salles.append(enfant)
 
+        # On relie les salles
+        # pour qu'elles soient
+        # toutes atteignables
         for enfant in enfants:
-            self.relier(salle.centre(), enfant.centre())
+            self.relier(salle.centre(),
+                        enfant.centre())  # on relie chaque salle à son parent
             autre = choice(enfants)
             oops = 0
             while autre == enfant and oops <= 1000:

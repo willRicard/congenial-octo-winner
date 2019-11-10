@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """ Joueur et Interface Tête Haute (ITH) """
 
@@ -44,7 +43,6 @@ class Joueur():
 
     def affiche(self, scr):
         """ Affiche le joueur """
-
     def level_up(self):
         """ Augmente les attributs du joueur """
         self.max_vie += self.level

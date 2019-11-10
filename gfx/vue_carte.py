@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+""" Affichage de la carte """
 
 import curses
 from carte import SYMBOLE_MUR, SYMBOLE_PROJECTILE
 from joueur import POISON, CURSE
+
 
 class VueCarte:
     """ Affichage de la carte """

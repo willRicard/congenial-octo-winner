@@ -18,14 +18,19 @@ class ITH:
         col = 0
         for i, field in enumerate(ITH_FIELDS):
             col += len(gettext(field))
-            self.win.addstr(0, col, gettext(field), curses.color_pair(i + 1) | curses.A_BOLD)
+            self.win.addstr(0, col, gettext(field),
+                            curses.color_pair(i + 1) | curses.A_BOLD)
             self.ith_cols.append(col)
             col += ITH_NUMBER_FIELD_LENGTH
 
-        self.win.addstr(
-            0, self.ith_cols[-1],
-            gettext(
-                ' < ^ v > déplacement | a attaque | b parade | p ramasser'))
+        try:
+            self.win.addstr(
+                0, self.ith_cols[-1],
+                gettext(
+                    ' < ^ v > déplacement | a attaque | b parade | p ramasser')
+            )
+        except curses.error:
+            pass
 
     def refresh(self, joueur):
         for i, ch in enumerate([
@@ -33,7 +38,7 @@ class ITH:
                 str(joueur.mana) + '/' + str(joueur.max_mana),
                 str(joueur.gold)
         ]):
-            self.win.addstr(0, self.ith_cols[i], ch, curses.color_pair(i + 1) | curses.A_BOLD)
-
+            self.win.addstr(0, self.ith_cols[i], ch,
+                            curses.color_pair(i + 1) | curses.A_BOLD)
 
         self.win.refresh()
