@@ -1,9 +1,21 @@
 # -*- coding: utf-8 -*-
 """ Affichage de la carte """
 
-import curses
+import sys
+
+import pygame as pg
+
 from carte import SYMBOLE_MUR, SYMBOLE_PROJECTILE
 from joueur import POISON, CURSE
+from gfx.window import WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT
+
+TILE_SIZE = 16
+
+LINES = WINDOW_DEFAULT_HEIGHT // TILE_SIZE
+COLS = WINDOW_DEFAULT_WIDTH // TILE_SIZE
+
+COLOR_SOL = pg.Color(18, 18, 18)
+COLOR_MUR = pg.Color(33, 33, 33)
 
 
 class VueCarte:
@@ -11,50 +23,47 @@ class VueCarte:
     def __init__(self, carte):
         self.carte = carte
 
-        self.pad = curses.newpad(carte.hauteur + 1, carte.largeur + 1)
+        try:
+            self.img_mage = pg.image.load("assets/mage.png")
+        except pg.error:
+            sys.exit(1)
 
         self.lig_scroll = 0
         self.col_scroll = 0
 
     def refresh(self, joueur):
-        """ Affiche la carte sur un écran ncurses :scr: """
+        """ Affiche la carte sur la fenêtre """
         # Scrolling
         carte = self.carte
         if joueur.lig - self.lig_scroll <= 1 and self.lig_scroll > 0:
             self.lig_scroll -= 1
-        elif joueur.lig - self.lig_scroll >= curses.LINES - 2 and self.lig_scroll <= carte.hauteur - curses.LINES:
+        elif joueur.lig - self.lig_scroll >= LINES - 2 and self.lig_scroll <= carte.hauteur - LINES:
             self.lig_scroll += 1
 
         if joueur.col - self.col_scroll <= 1 and self.col_scroll > 0:
             self.col_scroll -= 1
-        elif joueur.col - self.col_scroll >= curses.COLS - 2 and self.col_scroll <= carte.largeur - curses.COLS:
+        elif joueur.col - self.col_scroll >= COLS - 2 and self.col_scroll <= carte.largeur - COLS:
             self.col_scroll += 1
 
         for lig in range(carte.hauteur):
             for col in range(carte.largeur):
-                attr = curses.A_NORMAL
+                color = COLOR_SOL
                 if carte.cases[lig][col] == SYMBOLE_MUR:
-                    attr = curses.A_REVERSE
+                    color = COLOR_MUR
                 if carte.cases[lig][col] == SYMBOLE_PROJECTILE:
-                    attr = curses.color_pair(2)
-                self.pad.addstr(lig, col, carte.cases[lig][col], attr)
+                    color == COLOR_PROJECTILE
+                pg.draw.rect(
+                    pg.display.get_surface(), color,
+                    pg.Rect(lig * TILE_SIZE, col * TILE_SIZE, TILE_SIZE,
+                            TILE_SIZE))
 
         # Affichage du joueur
-        attr = curses.A_REVERSE
-        if joueur.aliment == POISON:
-            attr = curses.color_pair(4)
-        elif joueur.aliment == CURSE:
-            attr = curses.color_pair(5)
-        elif joueur.aliment == POISON | CURSE:
-            attr = curses.color_pair(6)
-
-        self.pad.addstr(joueur.lig, joueur.col, '@', attr)
-
-        # On laisse la derinière ligne pour l'ITH
-        self.pad.refresh(self.lig_scroll, self.col_scroll, 0, 0,
-                         curses.LINES - 2, curses.COLS - 1)
+        pg.display.get_surface().blit(
+            self.img_mage,
+            pg.Rect(joueur.lig * TILE_SIZE, joueur.col * TILE_SIZE, TILE_SIZE,
+                    TILE_SIZE))
 
     def center(self, joueur):
         """ On centre l'écran sur le joueur """
-        self.lig_scroll = joueur.lig - curses.LINES // 2
-        self.col_scroll = joueur.col - curses.COLS // 2
+        self.lig_scroll = joueur.lig - LINES // 2
+        self.col_scroll = joueur.col - COLS // 2

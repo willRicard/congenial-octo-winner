@@ -77,7 +77,7 @@ def main():
 
     view.center(joueur)
 
-    while True:
+    while not window.should_close:
         # On inflige une altération d'état aléatoire au joueur
         # avec une certaine probabilité
         if random() < PROBA_ALTERATION:
