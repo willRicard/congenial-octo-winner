@@ -17,9 +17,9 @@ FIELD_TYPE_QUOTIENT = 1  # un quotient: nombre/nombre
 NUMBER_FIELD_LENGTH = 3  # 3 chiffres max
 QUOTIENT_FIELD_LENGTH = 7  # 2*3 chiffres max + 1 slash
 
-ITH_FIELDS = [("❤︎ Vie ", FIELD_TYPE_QUOTIENT, COLOR_RED),
-              ("* Mana ", FIELD_TYPE_QUOTIENT, COLOR_BLUE),
-              ("$ Or ", FIELD_TYPE_NUMBER, COLOR_YELLOW)]
+ITH_FIELDS = [("❤︎ Vie", FIELD_TYPE_QUOTIENT, COLOR_RED),
+              ("* Mana", FIELD_TYPE_QUOTIENT, COLOR_BLUE),
+              ("$ Or", FIELD_TYPE_NUMBER, COLOR_YELLOW)]
 
 
 class ITH:
@@ -48,13 +48,16 @@ class ITH:
     def refresh(self, joueur):
         """ Rafraîchit l'affichage de l'ITH """
         champs = [
-            '%3d/%3d' % (joueur.vie, joueur.max_vie),
-            '%3d/%3d' % (joueur.mana, joueur.max_mana),
+            str(joueur.vie) + '/' + str(joueur.max_vie),
+            str(joueur.mana) + '/' + str(joueur.max_mana),
             str(joueur.gold)
         ]
 
-        for i, (_, _, color) in enumerate(ITH_FIELDS):
+        for i, (_, field_type, color) in enumerate(ITH_FIELDS):
+            if field_type == FIELD_TYPE_QUOTIENT and len(
+                    champs[i]) < QUOTIENT_FIELD_LENGTH:
+                champs[i].prepend(" ")
             self.win.addstr(0, self.cols[i], champs[i],
-                            curses.color_pair(color) | curses.A_BOLD)
+                            curses.color_pair(i + 1) | curses.A_BOLD)
 
         self.win.refresh()

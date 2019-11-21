@@ -32,7 +32,10 @@ class Preferences:
             Peut lever OSError. """
         with open(filename, "r") as fichier:
             for ligne in fichier:
-                clef, valeur = ligne.split(":")
+                try:
+                    clef, valeur = ligne.split(":")
+                except ValueError: # ligne invalide
+                    clef, valeur = "", ""
                 if clef == "realtime":
                     self.realtime = (valeur == "True\n")
                 elif clef == "difficulty":

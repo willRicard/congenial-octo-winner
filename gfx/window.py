@@ -37,9 +37,11 @@ class Window:
         self.scr.clear()
         self.scr.refresh()
 
+        self.should_close = False
+        self.open_preferences = False
+
         self.moving = 0
         self.shooting = False
-        self.open_preferences = False
 
     def close(self):
         """ Restaure le comportement par défaut du terminal """

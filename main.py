@@ -77,9 +77,10 @@ def main():
 
     view.center(joueur)
 
-    while True:
+    while not window.should_close:
         # On inflige une altération d'état aléatoire au joueur
         # avec une certaine probabilité
+        joueur.gold = int(random() * 999)
         if random() < PROBA_ALTERATION:
             if random() < 0.5 and not joueur.aliment & POISON:
                 joueur.aliment |= POISON

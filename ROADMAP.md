@@ -1,7 +1,10 @@
 # GUI
 
+- handle window resize
+
 ## HUD
 
+- small screen &rarr; display only field icon
 - display aliments
 
 ## Title screen
