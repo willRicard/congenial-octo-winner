@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-""" La fenêtre principale affiche l'interface utilisateur et gère les événements """
+""" La fenêtre principale affiche l'interface utilisateur
+et gère les événements """
 
 import sys
 import curses
@@ -14,10 +15,11 @@ KEY_ESCAPE = 27
 
 class Window:
     """ Fenêtre dans le terminal """
+
     def __init__(self):
-        """Initialisation des ressources
-        Le booléen :realtime: indique si on attend une action de l'utilisation pour rafraîchir.
-        """
+        """ Initialisation des ressources
+        Le booléen :realtime: indique si on attend
+        une action de l'utilisation pour rafraîchir """
         self.scr = curses.initscr()
         self.scr.keypad(True)
         curses.curs_set(0)
@@ -37,7 +39,11 @@ class Window:
         self.scr.clear()
         self.scr.refresh()
 
+        self.width = curses.COLS
+        self.height = curses.LINES
+
         self.should_close = False
+        self.resized = False
         self.open_preferences = False
 
         self.moving = 0
@@ -51,6 +57,7 @@ class Window:
     def set_realtime(self, realtime):
         """ Mode temps réel """
         self.scr.nodelay(realtime)
+        self.realtime = realtime
 
     def refresh(self):
         """ Gestion des événements """
@@ -74,34 +81,39 @@ class Window:
         elif key == ord('p'):
             self.open_preferences = True
         elif key == ord('q') or key == KEY_ESCAPE:
-            sys.exit(0)
+            self.should_close = True
+        elif key == curses.KEY_RESIZE:
+            self.scr.clear()
+            self.height, self.width = self.scr.getmaxyx()
+            self.resized = True
 
         sleep(FRAME_TIME)
 
+    def dialog(self, texte):
+        """ Affiche une boîte de dialogue contenant :texte: """
+        self.scr.nodelay(False)
 
-def dialog(texte):
-    """ Affiche une boîte de dialogue contenant :texte: """
-    lignes = texte.split("\n")
-    largeur = max(map(len, lignes)) + 3
-    hauteur = len(lignes) + 2
+        lignes = texte.split("\n")
+        largeur = max(map(len, lignes)) + 3
+        hauteur = len(lignes) + 2
 
-    frame = curses.newwin(hauteur, largeur, curses.LINES // 2 - hauteur // 2,
-                          curses.COLS // 2 - largeur // 2)
-    win = curses.newwin(hauteur - 2, largeur - 2,
-                        curses.LINES // 2 - hauteur // 2 + 1,
-                        curses.COLS // 2 - largeur // 2 + 1)
+        frame = curses.newwin(hauteur, largeur,
+                              self.height // 2 - hauteur // 2,
+                              self.width // 2 - largeur // 2)
+        win = curses.newwin(hauteur - 2, largeur - 2,
+                            self.height // 2 - hauteur // 2 + 1,
+                            self.width // 2 - largeur // 2 + 1)
 
-    try:
-        frame.border()
-        win.addstr(texte)
-    except curses.error:
-        sys.stderr.write(gettext("Votre terminal est trop petit !\n"))
-        sys.exit(1)
+        try:
+            frame.border()
+            win.addstr(texte)
+        except curses.error:
+            sys.stderr.write(gettext("Votre terminal est trop petit !\n"))
+            sys.exit(1)
 
-    frame.refresh()
+        frame.noutrefresh()
+        win.noutrefresh()
 
-    key = win.getstr()
-    if key == chr(27):  # Echap
-        sys.exit(0)
-    frame.clear()
-    frame.refresh()
+        self.refresh()
+
+        self.scr.nodelay(self.realtime)

@@ -9,11 +9,13 @@ HARD = 2
 
 class Preferences:
     """ Préférences utilisateur """
-    def __init__(self, realtime=False, difficulty=NORMAL):
+
+    def __init__(self, realtime=False, difficulty=NORMAL, icon_only=False):
         """ Initialise les préférences. Les champs non renseignés prennent
         les valeurs par défaut. """
         self.realtime = realtime
         self.difficulty = difficulty
+        self.icon_only = icon_only
 
     def save(self, filename):
         """ Écrit les préférences dans un fichier :filename:.
@@ -34,13 +36,14 @@ class Preferences:
             for ligne in fichier:
                 try:
                     clef, valeur = ligne.split(":")
-                except ValueError: # ligne invalide
+                except ValueError:  # ligne invalide
                     clef, valeur = "", ""
                 if clef == "realtime":
                     self.realtime = (valeur == "True\n")
                 elif clef == "difficulty":
                     self.difficulty = int(valeur)
+                elif clef == "ithIconOnly":
+                    self.icon_only = (valeur == "True\n")
                 else:
-                    stderr.write(
-                        "Warning: Unknown preference key {}".format(clef) +
-                        "\n")
+                    stderr.write("Warning: Unknown preference key {}".format(
+                        clef) + "\n")

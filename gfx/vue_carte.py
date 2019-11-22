@@ -8,7 +8,7 @@ from joueur import POISON, CURSE
 
 class VueCarte:
     """ Affichage de la carte """
-    def __init__(self, carte):
+    def __init__(self, carte, window):
         self.carte = carte
 
         self.pad = curses.newpad(carte.hauteur + 1, carte.largeur + 1)
@@ -16,18 +16,18 @@ class VueCarte:
         self.lig_scroll = 0
         self.col_scroll = 0
 
-    def refresh(self, joueur):
+    def refresh(self, joueur, window):
         """ Affiche la carte sur un écran ncurses :scr: """
         # Scrolling
         carte = self.carte
         if joueur.lig - self.lig_scroll <= 1 and self.lig_scroll > 0:
             self.lig_scroll -= 1
-        elif joueur.lig - self.lig_scroll >= curses.LINES - 2 and self.lig_scroll <= carte.hauteur - curses.LINES:
+        elif joueur.lig - self.lig_scroll >= window.height - 2 and self.lig_scroll <= carte.hauteur - window.height:
             self.lig_scroll += 1
 
         if joueur.col - self.col_scroll <= 1 and self.col_scroll > 0:
             self.col_scroll -= 1
-        elif joueur.col - self.col_scroll >= curses.COLS - 2 and self.col_scroll <= carte.largeur - curses.COLS:
+        elif joueur.col - self.col_scroll >= window.width - 2 and self.col_scroll <= carte.largeur - window.width:
             self.col_scroll += 1
 
         for lig in range(carte.hauteur):
@@ -51,10 +51,13 @@ class VueCarte:
         self.pad.addstr(joueur.lig, joueur.col, '@', attr)
 
         # On laisse la derinière ligne pour l'ITH
-        self.pad.refresh(self.lig_scroll, self.col_scroll, 0, 0,
-                         curses.LINES - 2, curses.COLS - 1)
+        try:
+            self.pad.refresh(self.lig_scroll, self.col_scroll, 0, 0,
+                             window.height - 2, window.width - 1)
+        except curses.error:
+            pass
 
-    def center(self, joueur):
+    def center(self, joueur, window):
         """ On centre l'écran sur le joueur """
-        self.lig_scroll = joueur.lig - curses.LINES // 2
-        self.col_scroll = joueur.col - curses.COLS // 2
+        self.lig_scroll = joueur.lig - window.height // 2
+        self.col_scroll = joueur.col - window.width // 2
