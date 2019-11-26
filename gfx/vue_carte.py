@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """ Affichage de la carte """
-
 import curses
-from carte import SYMBOLE_MUR, SYMBOLE_PROJECTILE
-from joueur import POISON, CURSE
+from carte import SYMBOLE_JOUEUR, SYMBOLE_SOL, SYMBOLE_MUR, SYMBOLE_MONSTRE, SYMBOLE_PROJECTILE
+from joueur import ALIMENT_POISON, ALIMENT_CURSE
+
+from gfx.window import COLOR_RED, COLOR_GREEN, COLOR_BLUE, COLOR_MAGENTA, COLOR_GREEN_MAGENTA
 
 
 class VueCarte:
@@ -36,26 +37,33 @@ class VueCarte:
                 if carte.cases[lig][col] == SYMBOLE_MUR:
                     attr = curses.A_REVERSE
                 if carte.cases[lig][col] == SYMBOLE_PROJECTILE:
-                    attr = curses.color_pair(2)
+                    attr = curses.color_pair(COLOR_BLUE)
                 self.pad.addstr(lig, col, carte.cases[lig][col], attr)
+
+        # Affichage des projectiles
+        for projectile in carte.projectiles:
+            self.pad.addstr(projectile.lig, projectile.col, SYMBOLE_PROJECTILE,
+                            curses.color_pair(COLOR_BLUE))
+
+        # Affichage des monstres
+        for entity in carte.entities:
+            self.pad.addstr(entity.lig, entity.col, SYMBOLE_MONSTRE,
+                            curses.color_pair(COLOR_RED))
 
         # Affichage du joueur
         attr = curses.A_REVERSE
-        if joueur.aliment == POISON:
-            attr = curses.color_pair(4)
-        elif joueur.aliment == CURSE:
-            attr = curses.color_pair(5)
-        elif joueur.aliment == POISON | CURSE:
-            attr = curses.color_pair(6)
+        if joueur.aliment == ALIMENT_POISON:
+            attr = curses.color_pair(COLOR_GREEN)
+        elif joueur.aliment == ALIMENT_CURSE:
+            attr = curses.color_pair(COLOR_MAGENTA)
+        elif joueur.aliment == ALIMENT_POISON | ALIMENT_CURSE:
+            attr = curses.color_pair(COLOR_GREEN_MAGENTA)
 
-        self.pad.addstr(joueur.lig, joueur.col, '@', attr)
+        self.pad.addstr(joueur.lig, joueur.col, SYMBOLE_JOUEUR, attr)
 
         # On laisse la derinière ligne pour l'ITH
-        try:
-            self.pad.refresh(self.lig_scroll, self.col_scroll, 0, 0,
-                             window.height - 2, window.width - 1)
-        except curses.error:
-            pass
+        self.pad.refresh(self.lig_scroll, self.col_scroll, 0, 0,
+                         window.height - 2, window.width - 1)
 
     def center(self, joueur, window):
         """ On centre l'écran sur le joueur """

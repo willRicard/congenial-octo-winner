@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """ Gestion des préférences utilisateur """
 from sys import stderr
+from gettext import gettext
 
 EASY = 0
 NORMAL = 1
@@ -9,21 +10,21 @@ HARD = 2
 
 class Preferences:
     """ Préférences utilisateur """
-
-    def __init__(self, realtime=False, difficulty=NORMAL, icon_only=False):
+    def __init__(self, realtime=False, difficulty=NORMAL, ith=False):
         """ Initialise les préférences. Les champs non renseignés prennent
-        les valeurs par défaut. """
+        les valeurs par défaut """
         self.realtime = realtime
         self.difficulty = difficulty
-        self.icon_only = icon_only
+        self.ith = ith
 
     def save(self, filename):
         """ Écrit les préférences dans un fichier :filename:.
-        En cas d'erreur renvoie `False` et affiche le message sur `stderr`. """
+        En cas d'erreur renvoie `False` et affiche le message sur `stderr` """
         try:
             with open(filename, "w") as fichier:
                 fichier.write("realtime:" + str(self.realtime) + "\n")
                 fichier.write("difficulty:" + str(self.difficulty) + "\n")
+                fichier.write("ith:" + str(self.ith) + "\n")
             return True
         except OSError as err:
             stderr.write(str(err))
@@ -31,19 +32,26 @@ class Preferences:
 
     def restore(self, filename):
         """ Lit les préférences depuis un fichier :filename:
-            Peut lever OSError. """
+            Peut lever OSError """
         with open(filename, "r") as fichier:
             for ligne in fichier:
                 try:
                     clef, valeur = ligne.split(":")
                 except ValueError:  # ligne invalide
                     clef, valeur = "", ""
-                if clef == "realtime":
-                    self.realtime = (valeur == "True\n")
-                elif clef == "difficulty":
-                    self.difficulty = int(valeur)
-                elif clef == "ithIconOnly":
-                    self.icon_only = (valeur == "True\n")
-                else:
-                    stderr.write("Warning: Unknown preference key {}".format(
-                        clef) + "\n")
+                try:
+                    if clef == "realtime":
+                        self.realtime = (valeur == "True\n")
+                    elif clef == "difficulty":
+                        self.difficulty = int(valeur)
+                    elif clef == "ith":
+                        self.ith = int(valeur)
+                    else:
+                        stderr.write(
+                            gettext("Attention: préférence inconnue {}\n").
+                            format(clef))
+                except ValueError:
+                    stderr.write(
+                        gettext(
+                            "Attention: Valeur invalide pour la préférence {}\n"
+                        ).format(clef))

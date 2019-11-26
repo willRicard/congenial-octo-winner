@@ -1,10 +1,7 @@
 # GUI
 
-- handle window resize
-
 ## HUD
 
-- small screen &rarr; display only field icon
 - display aliments
 
 ## Title screen
@@ -29,8 +26,9 @@ Description of each setting value.
 Spawn ${difficulty} per room except player start.
 A\* hunt once player within enemy's visible set until not visible **AND** far away (threshold distance).
 
-- blob: moves 1 in 2 turns, contact damage
-- ninja: moves every turn, contact damage
+- rat: moves at random 1 out of 2 turns, contact damage
+- orc: runs towards the player in a straight line
+- knight: blocks when fired at (shield but not move)
 - mage: moves 1 in 3 turns, no contact damage, casts magic bullet
 
 ## Boss
@@ -51,5 +49,4 @@ Une ligne d'ITH par joueur.
 
 # General TODO
 
-master: fix ITH
-2D GUI in separate branch
+2D GUI in separate branch `sdl`

@@ -4,10 +4,18 @@ et gère les événements """
 
 import sys
 import curses
-from time import sleep
+from time import time, sleep
 from gettext import gettext
 
 from joueur import NORTH, SOUTH, WEST, EAST
+
+# @enum Couleur d'affichage
+COLOR_RED = 1
+COLOR_BLUE = 2
+COLOR_YELLOW = 3
+COLOR_GREEN = 4
+COLOR_MAGENTA = 5
+COLOR_GREEN_MAGENTA = 6
 
 FRAME_TIME = 1 / 15
 KEY_ESCAPE = 27
@@ -15,7 +23,6 @@ KEY_ESCAPE = 27
 
 class Window:
     """ Fenêtre dans le terminal """
-
     def __init__(self):
         """ Initialisation des ressources
         Le booléen :realtime: indique si on attend
@@ -27,13 +34,16 @@ class Window:
         curses.cbreak()
         curses.start_color()
 
-        curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_RED)  # HP
-        curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)  # Mana
-        curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_YELLOW)  # Or
-        curses.init_pair(4, curses.COLOR_BLACK,
+        curses.init_pair(COLOR_RED, curses.COLOR_WHITE, curses.COLOR_RED)  # HP
+        curses.init_pair(COLOR_BLUE, curses.COLOR_WHITE,
+                         curses.COLOR_BLUE)  # Mana
+        curses.init_pair(COLOR_YELLOW, curses.COLOR_BLACK,
+                         curses.COLOR_YELLOW)  # Or
+        curses.init_pair(COLOR_GREEN, curses.COLOR_BLACK,
                          curses.COLOR_GREEN)  # Empoisonné
-        curses.init_pair(5, curses.COLOR_BLACK, curses.COLOR_MAGENTA)  # Maudit
-        curses.init_pair(6, curses.COLOR_MAGENTA,
+        curses.init_pair(COLOR_MAGENTA, curses.COLOR_BLACK,
+                         curses.COLOR_MAGENTA)  # Maudit
+        curses.init_pair(COLOR_GREEN_MAGENTA, curses.COLOR_MAGENTA,
                          curses.COLOR_GREEN)  # Poison & maudit
 
         self.scr.clear()
@@ -41,6 +51,9 @@ class Window:
 
         self.width = curses.COLS
         self.height = curses.LINES
+
+        self.realtime = False
+        self.last_frame = 0  # timestamp of the last frame
 
         self.should_close = False
         self.resized = False
@@ -87,7 +100,11 @@ class Window:
             self.height, self.width = self.scr.getmaxyx()
             self.resized = True
 
-        sleep(FRAME_TIME)
+        if self.realtime:
+            now = time()
+            if now - self.last_frame < FRAME_TIME:
+                sleep(FRAME_TIME - now + self.last_frame)
+            self.last_frame = time()
 
     def dialog(self, texte):
         """ Affiche une boîte de dialogue contenant :texte: """

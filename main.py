@@ -7,7 +7,7 @@ from gettext import gettext, bindtextdomain
 
 from prefs import Preferences
 from carte import Carte
-from joueur import Joueur, NORTH, SOUTH, EAST, WEST, POISON, CURSE
+from joueur import Joueur, NORTH, SOUTH, EAST, WEST, ALIMENT_POISON, ALIMENT_CURSE
 
 from gfx.window import Window
 from gfx.pref_dialog import PreferenceDialog
@@ -28,22 +28,46 @@ Vérifiez vos permissions !\n{}"
 PROBA_ALTERATION = 0.05
 
 
-def charger_preferences(path):
+def charger_preferences(path, window):
     """ Chargement / définition des préférences """
     prefs = Preferences()
 
     try:
         prefs.restore(path)
     except FileNotFoundError:
-        update_preferences(prefs, path)
+        PreferenceDialog(prefs, window).show()
+        prefs.save(path)
 
     return prefs
 
 
-def update_preferences(prefs, path):
+def update_preferences(prefs, path, window):
     """ Affiche le formulaire de configuration puis enregistre les options. """
-    PreferenceDialog(prefs).show()
-    prefs.save(path)
+    try:
+        PreferenceDialog(prefs, window).show()
+        prefs.save(path)
+    except OSError as err:
+        window.dialog(gettext(ERREUR_TEXTE).format(path, err.strerror))
+
+
+def deplacer_joueur(moving, joueur, carte):
+    """ Deplace le :joueur: sur la :carte: dans la direction :moving: """
+    lig, col = joueur.lig, joueur.col
+
+    if moving & NORTH:
+        lig -= 1
+    elif moving & SOUTH:
+        lig += 1
+    if moving & WEST:
+        col -= 1
+    elif moving & EAST:
+        col += 1
+
+    if carte.case_libre(lig, col):
+        joueur.lig = lig
+        joueur.col = col
+
+        joueur.facing = moving
 
 
 def main():
@@ -53,11 +77,11 @@ def main():
 
     window = Window()
 
-    pref_file = os.getenv("HOME") + os.sep + ".pyhack"
+    pref_file = os.path.join(os.getenv("HOME"), ".pyhack")
     try:
-        prefs = charger_preferences(pref_file)
+        prefs = charger_preferences(pref_file, window)
     except OSError as err:
-        window.dialog(gettext(ERREUR_TEXTE).format(path, err.strerror))
+        window.dialog(gettext(ERREUR_TEXTE).format(pref_file, err.strerror))
 
     window.set_realtime(prefs.realtime)
 
@@ -72,7 +96,8 @@ def main():
     depart = carte.salles[0]
     col, lig = depart.centre()
     joueur = Joueur(lig, col)
-    ith = ITH(window, prefs.icon_only)
+    carte.entities.append(joueur)
+    ith = ITH(window, prefs.ith)
 
     view.center(joueur, window)
 
@@ -80,19 +105,20 @@ def main():
         # On inflige une altération d'état aléatoire au joueur
         # avec une certaine probabilité
         if random() < PROBA_ALTERATION:
-            if random() < 0.5 and not joueur.aliment & POISON:
-                joueur.aliment |= POISON
-                window.dialog(gettext('Les miasmes du donjon vous ont empoisonné !'))
-            elif not joueur.aliment & CURSE:
-                joueur.aliment |= CURSE
-                window.dialog(gettext('Le donjon absorbe votre énergie magique !'))
+            if random() < 0.5 and not joueur.aliment & ALIMENT_POISON:
+                joueur.aliment |= ALIMENT_POISON
+                window.dialog(
+                    gettext('Les miasmes du donjon vous ont empoisonné !'))
+            elif not joueur.aliment & ALIMENT_CURSE:
+                joueur.aliment |= ALIMENT_CURSE
+                window.dialog(
+                    gettext('Le donjon absorbe votre énergie magique !'))
 
         if joueur.vie == 0:
             window.dialog('Game over !')
             break
 
-        joueur.update()
-        carte.update(joueur)
+        carte.update()
 
         view.refresh(joueur, window)
         ith.refresh(joueur)
@@ -101,32 +127,14 @@ def main():
         if window.resized:
             view = VueCarte(carte, window)
             view.refresh(joueur, window)
-            ith = ITH(window, prefs.icon_only)
+            ith = ITH(window, prefs.ith)
             ith.refresh(joueur)
 
         if window.open_preferences:
-            try:
-                update_preferences(prefs, pref_file)
-            except OSError as err:
-                window.dialog(gettext(ERREUR_TEXTE).format(path, err.strerror))
+            update_preferences(prefs, pref_file, window)
             window.set_realtime(prefs.realtime)
 
-        if window.moving & NORTH and carte.case_libre(joueur.lig - 1,
-                                                      joueur.col):
-            joueur.lig -= 1
-            joueur.facing = NORTH
-        elif window.moving & SOUTH and carte.case_libre(
-                joueur.lig + 1, joueur.col):
-            joueur.lig += 1
-            joueur.facing = SOUTH
-        if window.moving & WEST and carte.case_libre(joueur.lig,
-                                                     joueur.col - 1):
-            joueur.col -= 1
-            joueur.facing = WEST
-        elif window.moving & EAST and carte.case_libre(joueur.lig,
-                                                       joueur.col + 1):
-            joueur.col += 1
-            joueur.facing = EAST
+        deplacer_joueur(window.moving, joueur, carte)
 
         if window.shooting:
             joueur.shoot(carte)
