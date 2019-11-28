@@ -21,6 +21,7 @@ FRAME_TIME = 1 / 15
 KEY_ESCAPE = 27
 
 
+# pylint: disable=too-many-instance-attributes
 class Window:
     """ Fenêtre dans le terminal """
     def __init__(self):
@@ -49,8 +50,7 @@ class Window:
         self.scr.clear()
         self.scr.refresh()
 
-        self.width = curses.COLS
-        self.height = curses.LINES
+        self.height, self.width = self.scr.getmaxyx()
 
         self.realtime = False
         self.last_frame = 0  # timestamp of the last frame
@@ -101,7 +101,10 @@ class Window:
                 self.height, self.width = self.scr.getmaxyx()
                 self.resized = True
 
-            key = self.scr.getch()
+            if self.realtime:
+                key = self.scr.getch()
+            else:
+                key = -1
 
         if self.realtime:
             now = time()
@@ -111,7 +114,8 @@ class Window:
 
     def dialog(self, texte):
         """ Affiche une boîte de dialogue contenant :texte: """
-        self.scr.nodelay(False)
+        realtime = self.realtime
+        self.set_realtime(False)
 
         lignes = texte.split("\n")
         largeur = max(map(len, lignes)) + 3
@@ -134,6 +138,6 @@ class Window:
         frame.noutrefresh()
         win.noutrefresh()
 
-        win.getch()
+        self.refresh()
 
-        self.scr.nodelay(self.realtime)
+        self.set_realtime(realtime)
