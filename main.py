@@ -134,7 +134,8 @@ def main():
             update_preferences(prefs, pref_file, window)
             window.set_realtime(prefs.realtime)
 
-        deplacer_joueur(window.moving, joueur, carte)
+        if window.moving:
+            deplacer_joueur(window.moving, joueur, carte)
 
         if window.shooting:
             joueur.shoot(carte)

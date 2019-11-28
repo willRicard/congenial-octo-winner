@@ -76,29 +76,32 @@ class Window:
         """ Gestion des événements """
         self.scr.refresh()
 
-        key = self.scr.getch()
-
         self.moving = 0
         self.shooting = False
         self.open_preferences = False
-        if key == curses.KEY_UP:
-            self.moving |= NORTH
-        elif key == curses.KEY_DOWN:
-            self.moving |= SOUTH
-        if key == curses.KEY_LEFT:
-            self.moving |= WEST
-        elif key == curses.KEY_RIGHT:
-            self.moving |= EAST
-        elif key == ord('a'):
-            self.shooting = True
-        elif key == ord('p'):
-            self.open_preferences = True
-        elif key == ord('q') or key == KEY_ESCAPE:
-            self.should_close = True
-        elif key == curses.KEY_RESIZE:
-            self.scr.clear()
-            self.height, self.width = self.scr.getmaxyx()
-            self.resized = True
+
+        key = self.scr.getch()
+        while key != -1:
+            if key == curses.KEY_UP:
+                self.moving |= NORTH
+            elif key == curses.KEY_DOWN:
+                self.moving |= SOUTH
+            if key == curses.KEY_LEFT:
+                self.moving |= WEST
+            elif key == curses.KEY_RIGHT:
+                self.moving |= EAST
+            elif key == ord('a'):
+                self.shooting = True
+            elif key == ord('p'):
+                self.open_preferences = True
+            elif key == ord('q') or key == KEY_ESCAPE:
+                self.should_close = True
+            elif key == curses.KEY_RESIZE:
+                self.scr.clear()
+                self.height, self.width = self.scr.getmaxyx()
+                self.resized = True
+
+            key = self.scr.getch()
 
         if self.realtime:
             now = time()
@@ -131,6 +134,6 @@ class Window:
         frame.noutrefresh()
         win.noutrefresh()
 
-        self.refresh()
+        win.getch()
 
         self.scr.nodelay(self.realtime)

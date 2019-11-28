@@ -9,10 +9,10 @@ from joueur import NORTH, SOUTH, EAST, WEST
 class Projectile:
     """ Projectile magique """
     def __init__(self, parent, lig, col, direction):
-        self.parent = parent
-        self.lig = lig
-        self.col = col
-        self.direction = direction
+        self.parent = parent  # joueur ou ennemi
+        self.lig = lig  # ordonnée
+        self.col = col  # abscisse
+        self.direction = direction  # direction de propagation
 
     def update(self):
         """ Mise à jour """

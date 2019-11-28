@@ -123,7 +123,7 @@ class Carte:
                 for col in range(salle.left, salle.left + salle.width):
                     self.cases[lig][col] = SYMBOLE_SOL
 
-    def ajouter_projectile(self, joueur):  #, lig, col, direction):
+    def ajouter_projectile(self, joueur):
         """ Ajoute un projectile aux coordonnées :lig: :col: se déplaçant dans la :direction:
             Rien ne se passe si la case est occupée. """
         if self.case_libre(joueur.lig, joueur.col):
