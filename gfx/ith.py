@@ -3,12 +3,10 @@
 
 from gettext import gettext
 
-ITH_FIELDS = ["❤︎ Vie", "* Mana", "$ Or"]
-ITH_NUMBER_FIELD_LENGTH = 7  # 2*3 chiffres + 1 slash
-
 
 class ITH:
-    def __init__(self):
+    """ Affichage tête haute """
+    def __init__(self, window, display_mode):
         """ Précalcul des positions où afficher les champs """
         pass
 

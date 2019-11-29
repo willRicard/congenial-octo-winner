@@ -1,26 +1,27 @@
 # -*- coding: utf-8 -*-
 """ Affichage de la carte """
-
 import sys
 
 import pygame as pg
 
 from carte import SYMBOLE_MUR, SYMBOLE_PROJECTILE
-from joueur import POISON, CURSE
-from gfx.window import WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT
+from joueur import ALIMENT_POISON, ALIMENT_CURSE
+
+from monstre.rat import Rat
+from monstre.monstre import Monstre
 
 TILE_SIZE = 16
 
-LINES = WINDOW_DEFAULT_HEIGHT // TILE_SIZE
-COLS = WINDOW_DEFAULT_WIDTH // TILE_SIZE
-
 COLOR_SOL = pg.Color(18, 18, 18)
 COLOR_MUR = pg.Color(33, 33, 33)
+COLOR_PROJECTILE = pg.Color(33, 33, 255)
+COLOR_MONSTRE = pg.Color(255, 0, 0)
 
 
 class VueCarte:
     """ Affichage de la carte """
-    def __init__(self, carte):
+    def __init__(self, carte, window):
+        self.window = window
         self.carte = carte
 
         try:
@@ -34,15 +35,17 @@ class VueCarte:
     def refresh(self, joueur):
         """ Affiche la carte sur la fenêtre """
         # Scrolling
+        num_lines = self.window.height // TILE_SIZE
+        num_cols = self.window.width // TILE_SIZE
         carte = self.carte
         if joueur.lig - self.lig_scroll <= 1 and self.lig_scroll > 0:
             self.lig_scroll -= 1
-        elif joueur.lig - self.lig_scroll >= LINES - 2 and self.lig_scroll <= carte.hauteur - LINES:
+        elif joueur.lig - self.lig_scroll >= num_lines - 2 and self.lig_scroll <= carte.hauteur - num_lines:
             self.lig_scroll += 1
 
         if joueur.col - self.col_scroll <= 1 and self.col_scroll > 0:
             self.col_scroll -= 1
-        elif joueur.col - self.col_scroll >= COLS - 2 and self.col_scroll <= carte.largeur - COLS:
+        elif joueur.col - self.col_scroll >= num_cols - 2 and self.col_scroll <= carte.largeur - num_cols:
             self.col_scroll += 1
 
         for lig in range(carte.hauteur):
@@ -50,12 +53,24 @@ class VueCarte:
                 color = COLOR_SOL
                 if carte.cases[lig][col] == SYMBOLE_MUR:
                     color = COLOR_MUR
-                if carte.cases[lig][col] == SYMBOLE_PROJECTILE:
-                    color == COLOR_PROJECTILE
                 pg.draw.rect(
                     pg.display.get_surface(), color,
                     pg.Rect(lig * TILE_SIZE, col * TILE_SIZE, TILE_SIZE,
                             TILE_SIZE))
+
+        # Affichage des projectiles
+        for projectile in carte.projectiles:
+            pg.draw.rect(
+                pg.display.get_surface(), COLOR_PROJECTILE,
+                pg.Rect(projectile.lig * TILE_SIZE, projectile.col * TILE_SIZE,
+                        TILE_SIZE, TILE_SIZE))
+
+        # Affichage des monstres
+        for entity in carte.entities:
+            pg.draw.rect(
+                pg.display.get_surface(), COLOR_MONSTRE,
+                pg.Rect(entity.lig * TILE_SIZE, entity.col * TILE_SIZE,
+                        TILE_SIZE, TILE_SIZE))
 
         # Affichage du joueur
         pg.display.get_surface().blit(
@@ -63,7 +78,7 @@ class VueCarte:
             pg.Rect(joueur.lig * TILE_SIZE, joueur.col * TILE_SIZE, TILE_SIZE,
                     TILE_SIZE))
 
-    def center(self, joueur):
+    def center(self, joueur, window):
         """ On centre l'écran sur le joueur """
-        self.lig_scroll = joueur.lig - LINES // 2
-        self.col_scroll = joueur.col - COLS // 2
+        self.lig_scroll = joueur.lig - window.height // 2
+        self.col_scroll = joueur.col - window.width // 2

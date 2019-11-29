@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-""" La fenêtre principale affiche l'interface utilisateur et gère les événements """
+""" La fenêtre principale affiche l'interface utilisateur
+et gère les événements """
 
 import sys
 from time import sleep
@@ -7,7 +8,7 @@ from gettext import gettext
 
 import pygame as pg
 
-from joueur import NORTH, SOUTH, WEST, EAST
+from entity import NORTH, SOUTH, WEST, EAST
 
 FRAME_TIME = 1 / 15
 KEY_ESCAPE = 27
@@ -16,6 +17,7 @@ WINDOW_DEFAULT_WIDTH = 1000
 WINDOW_DEFAULT_HEIGHT = 800
 
 
+# pylint: disable=too-many-instance-attributes
 class Window:
     """ Fenêtre SDL """
     def __init__(self):
@@ -34,6 +36,15 @@ class Window:
         #                  curses.COLOR_GREEN)  # Poison & maudit
 
         self.should_close = False
+        self.open_preferences = False
+
+        self.height, self.width = self.scr.getmaxyx()
+
+        self.realtime = False
+        self.last_frame = 0  # timestamp of the last frame
+
+        self.should_close = False
+        self.resized = False
         self.open_preferences = False
 
         self.moving = 0
@@ -77,9 +88,8 @@ class Window:
 
         sleep(FRAME_TIME)
 
-
-def dialog(texte):
-    """ Affiche une boîte de dialogue contenant :texte: """
-    print(texte)
-    #from tkinter import messagebox
-    #messagebox.showinfo(texte)
+    def dialog(self, texte):
+        """ Affiche une boîte de dialogue contenant :texte: """
+        print(texte)
+        #from tkinter import messagebox
+        #messagebox.showinfo(texte)

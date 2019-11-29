@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """ Formulaire de configuration """
-import sys
 import curses
 from gettext import gettext
 from time import sleep
@@ -16,23 +15,33 @@ PREF_DIALOG_HORIZONTAL_PADDING = 16  # Marge horizontale. Crash si < 16
 
 
 class PreferenceDialog:
-    """ Formulaire de configuration """
-    def __init__(self, prefs=None):
+    """ Formulaire de configuration
+    Le constructeur peut lever curses.error et OSError
+    """
+    def __init__(self, prefs, window):
         self.prefs = prefs
 
-        titres = [gettext("Mode de jeu"), gettext("Difficulté")]
+        titres = [
+            gettext("Mode de jeu"),
+            gettext("Difficulté"),
+            gettext("Affichage tête-haute")
+        ]
 
-        self.champs = [[gettext("Tour par tour"),
-                        gettext("Temps réel")],
-                       [
-                           gettext("Facile"),
-                           gettext("Normale"),
-                           gettext("Difficile")
-                       ]]
+        self.champs = [
+            [gettext("Tour par tour"),
+             gettext("Temps réel")],
+            [gettext("Facile"),
+             gettext("Normale"),
+             gettext("Difficile")],
+            [gettext("Texte"),
+             gettext("Icônes"),
+             gettext("Compact")]
+        ]
         self.champ_sel = 0
         self.choix = [0] * len(self.champs)
         self.choix[0] = int(prefs.realtime)
         self.choix[1] = prefs.difficulty
+        self.choix[2] = int(prefs.ith)
         self.cols = []  # précalcul des positions pour chaque label
 
         hauteur = 2 * len(self.champs) + PREF_DIALOG_VERTICAL_PADDING
@@ -43,11 +52,10 @@ class PreferenceDialog:
 
         try:
             self.win = curses.newwin(hauteur, largeur,
-                                     curses.LINES // 2 - hauteur // 2,
-                                     curses.COLS // 2 - largeur // 2)
-        except curses.error:
-            sys.stderr.write(gettext("Votre terminal est trop petit !\n"))
-            sys.exit(1)
+                                     window.height // 2 - hauteur // 2,
+                                     window.width // 2 - largeur // 2)
+        except curses.error:  # le terminal est trop petit
+            return
 
         self.win.border()
         self.win.keypad(True)
@@ -126,6 +134,7 @@ class PreferenceDialog:
 
         self.prefs.realtime = bool(self.choix[0])
         self.prefs.difficulty = self.choix[1]
+        self.prefs.ith = self.choix[2]
 
         self.win.clear()
         self.win.refresh()

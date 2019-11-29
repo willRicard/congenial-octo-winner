@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """ Bases de la Programmation Impérative : Projet Python """
+import sys
 import os
 from random import seed, random
 from gettext import gettext, bindtextdomain
 
 from prefs import Preferences
 from carte import Carte
-from joueur import Joueur, NORTH, SOUTH, EAST, WEST, POISON, CURSE
+from entity import NORTH, SOUTH, EAST, WEST
+from joueur import Joueur, ALIMENT_POISON, ALIMENT_CURSE
 
-from gfx.window import Window, dialog
+from gfx.window import Window
 from gfx.pref_dialog import PreferenceDialog
 from gfx.vue_carte import VueCarte
 from gfx.ith import ITH
@@ -22,32 +24,30 @@ Appuyez sur 'p' pour éditer vos préférences.\n\n\
 Appuyez sur Échap. pour quitter.\n\
 Appuyez sur Entrée pour continuer."
 
-ERREUR_TEXTE = "Impossible de lire/écrire vos préférences depuis {} Vérifiez vos permissions !\n{}"
+ERREUR_TEXTE = "Impossible de lire/écrire vos préférences depuis {}\
+Vérifiez vos permissions !\n{}"
 
-PROBA_ALTERATION = 0.05
 
-
-def charger_preferences(path):
+def charger_preferences(path, window):
     """ Chargement / définition des préférences """
     prefs = Preferences()
 
     try:
         prefs.restore(path)
     except FileNotFoundError:
-        update_preferences(prefs, path)
-    except OSError as err:
-        dialog(gettext(ERREUR_TEXTE).format(path, err.strerror))
+        PreferenceDialog(prefs, window).show()
+        prefs.save(path)
 
     return prefs
 
 
-def update_preferences(prefs, path):
+def update_preferences(prefs, path, window):
     """ Affiche le formulaire de configuration puis enregistre les options. """
-    PreferenceDialog(prefs).show()
     try:
+        PreferenceDialog(prefs, window).show()
         prefs.save(path)
     except OSError as err:
-        dialog(gettext(ERREUR_TEXTE).format(path, err.strerror))
+        window.dialog(gettext(ERREUR_TEXTE).format(path, err.strerror))
 
 
 def main():
@@ -57,68 +57,51 @@ def main():
 
     window = Window()
 
-    pref_file = os.getenv("HOME") + os.sep + ".pyhack"
-    prefs = charger_preferences(pref_file)
+    pref_file = os.path.join(os.getenv("HOME"), ".pyhack")
+    try:
+        prefs = charger_preferences(pref_file, window)
+    except OSError as err:
+        window.dialog(gettext(ERREUR_TEXTE).format(pref_file, err.strerror))
 
     window.set_realtime(prefs.realtime)
 
     # Message d'accueil
-    dialog(gettext(INTRO_TEXTE))
+    window.dialog(gettext(INTRO_TEXTE))
 
     carte = Carte(64, 128)
     carte.generer_salles()
 
-    view = VueCarte(carte)
+    view = VueCarte(carte, window)
 
     depart = carte.salles[0]
     col, lig = depart.centre()
     joueur = Joueur(lig, col)
-    ith = ITH()
-
-    view.center(joueur)
+    carte.entities.append(joueur)
+    ith = ITH(window, prefs.ith)
 
     while not window.should_close:
-        # On inflige une altération d'état aléatoire au joueur
-        # avec une certaine probabilité
-        if random() < PROBA_ALTERATION:
-            if random() < 0.5 and not joueur.aliment & POISON:
-                joueur.aliment |= POISON
-                dialog(gettext('Les miasmes du donjon vous ont empoisonné !'))
-            elif not joueur.aliment & CURSE:
-                joueur.aliment |= CURSE
-                dialog(gettext('Le donjon absorbe votre énergie magique !'))
-
         if joueur.vie == 0:
-            dialog('Game over !')
+            window.dialog('Game over !')
             break
 
-        joueur.update()
-        carte.update(joueur)
+        carte.update()
 
-        view.refresh(joueur)
+        view.refresh(joueur, window)
         ith.refresh(joueur)
         window.refresh()
 
+        if window.resized:
+            view = VueCarte(carte, window)
+            view.refresh(joueur, window)
+            ith = ITH(window, prefs.ith)
+            ith.refresh(joueur)
+
         if window.open_preferences:
-            update_preferences(prefs, pref_file)
+            update_preferences(prefs, pref_file, window)
             window.set_realtime(prefs.realtime)
 
-        if window.moving & NORTH and carte.case_libre(joueur.lig - 1,
-                                                      joueur.col):
-            joueur.lig -= 1
-            joueur.facing = NORTH
-        elif window.moving & SOUTH and carte.case_libre(
-                joueur.lig + 1, joueur.col):
-            joueur.lig += 1
-            joueur.facing = SOUTH
-        if window.moving & WEST and carte.case_libre(joueur.lig,
-                                                     joueur.col - 1):
-            joueur.col -= 1
-            joueur.facing = WEST
-        elif window.moving & EAST and carte.case_libre(joueur.lig,
-                                                       joueur.col + 1):
-            joueur.col += 1
-            joueur.facing = EAST
+        if window.moving:
+            joueur.deplacer(carte, window.moving)
 
         if window.shooting:
             joueur.shoot(carte)
