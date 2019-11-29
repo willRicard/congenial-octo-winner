@@ -4,11 +4,15 @@ import curses
 from carte import SYMBOLE_JOUEUR, SYMBOLE_SOL, SYMBOLE_MUR, SYMBOLE_MONSTRE, SYMBOLE_PROJECTILE
 from joueur import ALIMENT_POISON, ALIMENT_CURSE
 
+from monstre.rat import Rat
+from monstre.monstre import Monstre
+
 from gfx.window import COLOR_RED, COLOR_GREEN, COLOR_BLUE, COLOR_MAGENTA, COLOR_GREEN_MAGENTA
 
 
 class VueCarte:
     """ Affichage de la carte """
+
     def __init__(self, carte, window):
         self.carte = carte
 
@@ -47,7 +51,13 @@ class VueCarte:
 
         # Affichage des monstres
         for entity in carte.entities:
-            self.pad.addstr(entity.lig, entity.col, SYMBOLE_MONSTRE,
+            symbole = ""
+            if isinstance(entity, Rat):
+                symbole = "r"
+            elif isinstance(entity, Monstre):
+                symbole = "X"
+
+            self.pad.addstr(entity.lig, entity.col, symbole,
                             curses.color_pair(COLOR_RED))
 
         # Affichage du joueur

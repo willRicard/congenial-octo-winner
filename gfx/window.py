@@ -7,7 +7,7 @@ import curses
 from time import time, sleep
 from gettext import gettext
 
-from joueur import NORTH, SOUTH, WEST, EAST
+from entity import NORTH, SOUTH, WEST, EAST
 
 # @enum Couleur d'affichage
 COLOR_RED = 1

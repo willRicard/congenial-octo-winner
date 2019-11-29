@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
-""" Joueur et Interface Tête Haute (ITH) """
+""" Joueur """
 from random import random
 
 from entity import Entity
-
-NORTH = 1
-SOUTH = 2
-WEST = 4
-EAST = 8
 
 BASE_VIE = 100
 BASE_MANA = 100
@@ -19,6 +14,7 @@ ALIMENT_CURSE = 2
 
 class Joueur(Entity):
     """ Joueur représenté par un @ """
+
     def __init__(self, lig, col):
         super(Joueur, self).__init__(lig, col, vie=BASE_VIE)
 
@@ -26,8 +22,6 @@ class Joueur(Entity):
 
         self.level = 1
         self.exp = 0
-
-        self.facing = NORTH
 
     def update(self):
         """ Met a jour l'etat du joueur suivant ses altérations d'état. """

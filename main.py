@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """ Bases de la Programmation Impérative : Projet Python """
+import sys
 import os
 from random import seed, random
 from gettext import gettext, bindtextdomain
 
 from prefs import Preferences
 from carte import Carte
-from joueur import Joueur, NORTH, SOUTH, EAST, WEST, ALIMENT_POISON, ALIMENT_CURSE
+from entity import NORTH, SOUTH, EAST, WEST
+from joueur import Joueur, ALIMENT_POISON, ALIMENT_CURSE
 
 from gfx.window import Window
 from gfx.pref_dialog import PreferenceDialog
@@ -24,8 +26,6 @@ Appuyez sur Entrée pour continuer."
 
 ERREUR_TEXTE = "Impossible de lire/écrire vos préférences depuis {}\
 Vérifiez vos permissions !\n{}"
-
-PROBA_ALTERATION = 0.05
 
 
 def charger_preferences(path, window):
@@ -50,29 +50,9 @@ def update_preferences(prefs, path, window):
         window.dialog(gettext(ERREUR_TEXTE).format(path, err.strerror))
 
 
-def deplacer_joueur(moving, joueur, carte):
-    """ Deplace le :joueur: sur la :carte: dans la direction :moving: """
-    lig, col = joueur.lig, joueur.col
-
-    if moving & NORTH:
-        lig -= 1
-    elif moving & SOUTH:
-        lig += 1
-    if moving & WEST:
-        col -= 1
-    elif moving & EAST:
-        col += 1
-
-    if carte.case_libre(lig, col):
-        joueur.lig = lig
-        joueur.col = col
-
-        joueur.facing = moving
-
-
 def main():
     """ Point d'entrée du programme """
-    seed(0)
+    seed(1)
     bindtextdomain("messages", ".")
 
     window = Window()
@@ -102,18 +82,6 @@ def main():
     view.center(joueur, window)
 
     while not window.should_close:
-        # On inflige une altération d'état aléatoire au joueur
-        # avec une certaine probabilité
-        if random() < PROBA_ALTERATION:
-            if random() < 0.5 and not joueur.aliment & ALIMENT_POISON:
-                joueur.aliment |= ALIMENT_POISON
-                window.dialog(
-                    gettext('Les miasmes du donjon vous ont empoisonné !'))
-            elif not joueur.aliment & ALIMENT_CURSE:
-                joueur.aliment |= ALIMENT_CURSE
-                window.dialog(
-                    gettext('Le donjon absorbe votre énergie magique !'))
-
         if joueur.vie == 0:
             window.dialog('Game over !')
             break
@@ -135,7 +103,7 @@ def main():
             window.set_realtime(prefs.realtime)
 
         if window.moving:
-            deplacer_joueur(window.moving, joueur, carte)
+            joueur.deplacer(carte, window.moving)
 
         if window.shooting:
             joueur.shoot(carte)

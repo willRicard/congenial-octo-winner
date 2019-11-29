@@ -2,7 +2,7 @@
 # -*- coding: utf-* -*-
 """ Projectile magique """
 
-from joueur import NORTH, SOUTH, EAST, WEST
+from entity import NORTH, SOUTH, EAST, WEST
 
 
 # pylint: disable=too-few-public-methods

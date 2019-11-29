@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """ Monstre """
 from entity import Entity, a_etoile, distance
-
 from joueur import Joueur
 
 THRESHOLD_DISTANCE = 20
@@ -10,18 +9,13 @@ THRESHOLD_DISTANCE = 20
 # pylint: disable=too-few-public-methods
 class Monstre(Entity):
     """ Monstre hostile aux joueurs """
+
     def __init__(self, carte, lig, col, vie=1):
         super(Monstre, self).__init__(lig, col, vie)
         self.carte = carte
 
-        self.moved = False
-
     def update(self):
         """ Déplacement vers la cible """
-        if self.moved:
-            self.moved = False
-            return
-
         start = (self.lig, self.col)
         for entity in self.carte.entities:
             if isinstance(entity, Joueur) and distance(
@@ -32,4 +26,6 @@ class Monstre(Entity):
 
                 self.lig = prochain[0]
                 self.col = prochain[1]
-                self.moved = True
+
+    def attaquer(self, joueur):
+        joueur.vie -= 1

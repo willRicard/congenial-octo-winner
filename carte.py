@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """ Tableau 2D de caractères """
-from random import random, randrange, choice
+from random import random, randrange, choice, choices
 
 from rect import Rect
 
-from monstre import Monstre
+from monstre import SPAWN_RATE
+from monstre.monstre import Monstre
+from monstre.rat import Rat
 from projectile import Projectile
 
 NUM_SALLES = 10
@@ -93,7 +95,8 @@ class Carte:
                 # sauf si c'est la salle de départ
                 if self.salles:
                     col, lig = enfant.centre()
-                    self.entities.append(Monstre(self, lig, col))
+                    classe_monstre = choices((Rat, Monstre), weights=SPAWN_RATE[0])[0]
+                    self.entities.append(classe_monstre(self, lig, col))
                 self.salles.append(enfant)
 
         # On relie les salles
