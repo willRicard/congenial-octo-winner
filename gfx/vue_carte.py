@@ -72,8 +72,11 @@ class VueCarte:
         self.pad.addstr(joueur.lig, joueur.col, SYMBOLE_JOUEUR, attr)
 
         # On laisse la derinière ligne pour l'ITH
-        self.pad.refresh(self.lig_scroll, self.col_scroll, 0, 0,
-                         window.height - 2, window.width - 1)
+        try:
+            self.pad.refresh(self.lig_scroll, self.col_scroll, 0, 0,
+                             window.height - 2, window.width - 1)
+        except Exception:
+            pass
 
     def center(self, joueur, window):
         """ On centre l'écran sur le joueur """

@@ -11,10 +11,11 @@ BASE_MANA = 100
 ALIMENT_POISON = 1
 ALIMENT_CURSE = 2
 
+PROBA_RECOVER = 0.02
+
 
 class Joueur(Entity):
     """ Joueur représenté par un @ """
-
     def __init__(self, lig, col):
         super(Joueur, self).__init__(lig, col, vie=BASE_VIE)
 
@@ -29,6 +30,9 @@ class Joueur(Entity):
             self.vie -= 1
         if self.aliment & ALIMENT_CURSE and self.mana > 0 and random() < 0.2:
             self.mana -= 1
+
+        if random() < PROBA_RECOVER:
+            self.aliment &= 0
 
     def level_up(self):
         """ Augmente les attributs du joueur """

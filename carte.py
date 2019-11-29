@@ -4,9 +4,9 @@ from random import random, randrange, choice, choices
 
 from rect import Rect
 
-from monstre import SPAWN_RATE
-from monstre.monstre import Monstre
+from monstre.monstre import Monstre, SPAWN_RATE
 from monstre.rat import Rat
+from monstre.goblin import Goblin
 from projectile import Projectile
 
 NUM_SALLES = 10
@@ -95,7 +95,8 @@ class Carte:
                 # sauf si c'est la salle de départ
                 if self.salles:
                     col, lig = enfant.centre()
-                    classe_monstre = choices((Rat, Monstre), weights=SPAWN_RATE[0])[0]
+                    classe_monstre = choices([Rat, Goblin],
+                                             weights=SPAWN_RATE[1])[0]
                     self.entities.append(classe_monstre(self, lig, col))
                 self.salles.append(enfant)
 

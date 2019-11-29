@@ -52,7 +52,7 @@ def update_preferences(prefs, path, window):
 
 def main():
     """ Point d'entrée du programme """
-    seed(1)
+    seed(0)
     bindtextdomain("messages", ".")
 
     window = Window()
