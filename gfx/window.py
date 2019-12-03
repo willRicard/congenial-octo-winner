@@ -38,7 +38,8 @@ class Window:
         self.should_close = False
         self.open_preferences = False
 
-        self.height, self.width = self.scr.getmaxyx()
+        self.width = WINDOW_DEFAULT_WIDTH
+        self.height = WINDOW_DEFAULT_HEIGHT
 
         self.realtime = False
         self.last_frame = 0  # timestamp of the last frame

@@ -21,7 +21,6 @@ COLOR_MONSTRE = pg.Color(255, 0, 0)
 class VueCarte:
     """ Affichage de la carte """
     def __init__(self, carte, window):
-        self.window = window
         self.carte = carte
 
         try:
@@ -32,11 +31,11 @@ class VueCarte:
         self.lig_scroll = 0
         self.col_scroll = 0
 
-    def refresh(self, joueur):
+    def refresh(self, joueur, window):
         """ Affiche la carte sur la fenêtre """
         # Scrolling
-        num_lines = self.window.height // TILE_SIZE
-        num_cols = self.window.width // TILE_SIZE
+        num_lines = window.height // TILE_SIZE
+        num_cols = window.width // TILE_SIZE
         carte = self.carte
         if joueur.lig - self.lig_scroll <= 1 and self.lig_scroll > 0:
             self.lig_scroll -= 1
