@@ -22,6 +22,7 @@ class VueCarte:
     """ Affichage de la carte """
     def __init__(self, carte, window):
         self.carte = carte
+        self.surface = pg.Surface((window.width, window.height))
 
         try:
             self.img_mage = pg.image.load("assets/mage.png")
@@ -43,9 +44,9 @@ class VueCarte:
             self.lig_scroll += 1
 
         if joueur.col - self.col_scroll <= 1 and self.col_scroll > 0:
-            self.col_scroll -= 1
-        elif joueur.col - self.col_scroll >= num_cols - 2 and self.col_scroll <= carte.largeur - num_cols:
             self.col_scroll += 1
+        elif joueur.col - self.col_scroll >= num_cols - 2 and self.col_scroll <= carte.largeur - num_cols:
+            self.col_scroll -= 1
 
         for lig in range(carte.hauteur):
             for col in range(carte.largeur):
@@ -53,29 +54,34 @@ class VueCarte:
                 if carte.cases[lig][col] == SYMBOLE_MUR:
                     color = COLOR_MUR
                 pg.draw.rect(
-                    pg.display.get_surface(), color,
-                    pg.Rect(lig * TILE_SIZE, col * TILE_SIZE, TILE_SIZE,
+                    self.surface, color,
+                    pg.Rect(col * TILE_SIZE, lig * TILE_SIZE, TILE_SIZE,
                             TILE_SIZE))
 
         # Affichage des projectiles
         for projectile in carte.projectiles:
             pg.draw.rect(
-                pg.display.get_surface(), COLOR_PROJECTILE,
-                pg.Rect(projectile.lig * TILE_SIZE, projectile.col * TILE_SIZE,
+                self.surface, COLOR_PROJECTILE,
+                pg.Rect(projectile.col * TILE_SIZE, projectile.lig * TILE_SIZE,
                         TILE_SIZE, TILE_SIZE))
 
         # Affichage des monstres
         for entity in carte.entities:
             pg.draw.rect(
-                pg.display.get_surface(), COLOR_MONSTRE,
-                pg.Rect(entity.lig * TILE_SIZE, entity.col * TILE_SIZE,
+                self.surface, COLOR_MONSTRE,
+                pg.Rect(entity.col * TILE_SIZE, entity.lig * TILE_SIZE,
                         TILE_SIZE, TILE_SIZE))
 
         # Affichage du joueur
-        pg.display.get_surface().blit(
+        self.surface.blit(
             self.img_mage,
-            pg.Rect(joueur.lig * TILE_SIZE, joueur.col * TILE_SIZE, TILE_SIZE,
+            pg.Rect(joueur.col * TILE_SIZE, joueur.lig * TILE_SIZE, TILE_SIZE,
                     TILE_SIZE))
+
+        pg.display.get_surface().blit(
+            self.surface,
+            pg.Rect(self.col_scroll * TILE_SIZE, self.lig_scroll * TILE_SIZE,
+                    num_cols * TILE_SIZE, num_lines * TILE_SIZE))
 
     def center(self, joueur, window):
         """ On centre l'écran sur le joueur """

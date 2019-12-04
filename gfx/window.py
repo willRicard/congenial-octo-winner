@@ -7,6 +7,7 @@ from time import sleep
 from gettext import gettext
 
 import pygame as pg
+from pygame._sdl2 import messagebox
 
 from entity import NORTH, SOUTH, WEST, EAST
 
@@ -91,6 +92,4 @@ class Window:
 
     def dialog(self, texte):
         """ Affiche une boîte de dialogue contenant :texte: """
-        print(texte)
-        #from tkinter import messagebox
-        #messagebox.showinfo(texte)
+        messagebox('Pyhack', texte)
