@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """ Affichage de la carte """
 import sys
-
 import pygame as pg
 
-from carte import SYMBOLE_MUR, SYMBOLE_PROJECTILE
 from joueur import ALIMENT_POISON, ALIMENT_CURSE
 
 from monstre.rat import Rat
@@ -50,9 +48,9 @@ class VueCarte:
 
         for lig in range(carte.hauteur):
             for col in range(carte.largeur):
-                color = COLOR_SOL
-                if carte.cases[lig][col] == SYMBOLE_MUR:
-                    color = COLOR_MUR
+                color = COLOR_MUR
+                if carte.cases[lig] & 1 << col:
+                    color = COLOR_SOL
                 pg.draw.rect(
                     self.surface, color,
                     pg.Rect(col * TILE_SIZE, lig * TILE_SIZE, TILE_SIZE,

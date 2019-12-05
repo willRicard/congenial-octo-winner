@@ -16,11 +16,12 @@ class Projectile:
 
     def update(self):
         """ Mise à jour """
-        if self.direction == NORTH:
+        if self.direction & NORTH:
             self.lig -= 1
-        elif self.direction == SOUTH:
+        elif self.direction & SOUTH:
             self.lig += 1
-        elif self.direction == WEST:
+
+        if self.direction & WEST:
             self.col -= 1
-        elif self.direction == EAST:
+        elif self.direction & EAST:
             self.col += 1

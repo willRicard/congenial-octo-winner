@@ -14,12 +14,6 @@ PROBA_ARRET = 0.2
 PROBA_GRANDE_SALLE = 0.2
 EPAISSEUR_MUR = 1
 
-SYMBOLE_JOUEUR = '@'
-SYMBOLE_PROJECTILE = '*'
-SYMBOLE_SOL = '.'
-SYMBOLE_MUR = '#'
-SYMBOLE_MONSTRE = 'X'
-
 
 class Carte:
     """ Une carte de caractères """
@@ -27,8 +21,7 @@ class Carte:
         self.hauteur = hauteur
         self.largeur = largeur
 
-        self.cases = [[SYMBOLE_MUR for col in range(largeur)]
-                      for lig in range(hauteur)]
+        self.cases = [0 for lig in range(hauteur)]
 
         self.salles = []
 
@@ -44,14 +37,14 @@ class Carte:
             col = depart[0]
             for lig in range(min(depart[1], arrivee[1]),
                              max(depart[1], arrivee[1]) + 1):
-                self.cases[lig][col] = SYMBOLE_SOL
+                self.cases[lig] |= 1 << col
         else:
             lig = depart[1]
             for col in range(min(depart[0], arrivee[0]),
                              max(depart[0], arrivee[0]) + 1):
-                self.cases[lig][col] = SYMBOLE_SOL
+                self.cases[lig] |= 1 << col
 
-    def partitionner(self, salle):
+    def partitionner(self, salle, depth=0):
         """ Découpe une salle en quatre """
         # Condition d'arrêt: arrêt aléatoire ou salle trop petite
         if salle.width <= 10 or salle.height <= 10:
@@ -65,18 +58,25 @@ class Carte:
 
         enfants = [
             # Haut gauche
-            Rect(salle.left, salle.top, x_split, y_split),
+            Rect(salle.left, salle.top, x_split, y_split, depth=depth),
             # Haut droite
-            Rect(salle.left + x_split + EPAISSEUR_MUR, salle.top,
-                 salle.width - x_split - 2 * EPAISSEUR_MUR, y_split),
+            Rect(salle.left + x_split + EPAISSEUR_MUR,
+                 salle.top,
+                 salle.width - x_split - 2 * EPAISSEUR_MUR,
+                 y_split,
+                 depth=depth),
             # Bas gauche
-            Rect(salle.left, salle.top + y_split + EPAISSEUR_MUR, x_split,
-                 salle.height - y_split - 2 * EPAISSEUR_MUR),
+            Rect(salle.left,
+                 salle.top + y_split + EPAISSEUR_MUR,
+                 x_split,
+                 salle.height - y_split - 2 * EPAISSEUR_MUR,
+                 depth=depth),
             # Bas droite
             Rect(salle.left + x_split + EPAISSEUR_MUR,
                  salle.top + y_split + EPAISSEUR_MUR,
                  salle.width - x_split - 2 * EPAISSEUR_MUR,
-                 salle.height - y_split - 2 * EPAISSEUR_MUR)
+                 salle.height - y_split - 2 * EPAISSEUR_MUR,
+                 depth=depth)
         ]
 
         # on copie pour enlever
@@ -85,19 +85,12 @@ class Carte:
         for enfant in list(enfants):
             # profondeur suivante
             if random() > PROBA_ARRET + PROBA_GRANDE_SALLE:
-                self.partitionner(enfant)
+                self.partitionner(enfant, depth=depth + 1)
             # pas de salle
             elif random() < PROBA_ARRET:
                 enfants.remove(enfant)
             # grande salle
             else:
-                # on ajoute un monstre dans une grande salle
-                # sauf si c'est la salle de départ
-                if self.salles:
-                    col, lig = enfant.centre()
-                    classe_monstre = choices([Rat, Goblin],
-                                             weights=SPAWN_RATE[1])[0]
-                    self.entities.append(classe_monstre(self, lig, col))
                 self.salles.append(enfant)
 
         # On relie les salles
@@ -125,7 +118,20 @@ class Carte:
         for salle in self.salles:
             for lig in range(salle.top, salle.top + salle.height):
                 for col in range(salle.left, salle.left + salle.width):
-                    self.cases[lig][col] = SYMBOLE_SOL
+                    self.cases[lig] |= 1 << col
+
+    def ajouter_monstres(self, difficulte):
+        """ Ajoute des monstres en tenant compte de la :difficulte: """
+        num_monstres = [3, 2, 1]
+        # on ajoute pas de monstres dans la salle de départ
+        for salle in self.salles[1:]:
+            for _ in range(num_monstres[salle.depth]):
+                col, lig = salle.centre()
+                col += randrange(0, 4)
+                lig += randrange(0, 4)
+                classe_monstre = choices([Rat, Goblin],
+                                         weights=SPAWN_RATE[difficulte])[0]
+                self.entities.append(classe_monstre(self, lig, col))
 
     def ajouter_projectile(self, joueur):
         """ Ajoute un projectile aux coordonnées :lig: :col: se déplaçant dans la :direction:
@@ -136,12 +142,8 @@ class Carte:
 
     def update(self):
         """ Met à jour le joueur, les monstres et les projectiles """
-        for entity in self.entities:
-            entity.update()
         for projectile in self.projectiles.copy():
             projectile.update()
-            if self.cases[projectile.lig][projectile.col] == SYMBOLE_MUR:
-                self.projectiles.remove(projectile)
             for monstre in filter(lambda x: isinstance(x, Monstre),
                                   self.entities.copy()):
                 if (projectile.lig, projectile.col) == (monstre.lig,
@@ -152,11 +154,15 @@ class Carte:
                         projectile.parent.gold += monstre.gold
                         self.entities.remove(monstre)
                         self.projectiles.remove(projectile)
+            if not self.case_libre(projectile.lig, projectile.col):
+                self.projectiles.remove(projectile)
+        for entity in self.entities:
+            entity.update()
 
     def case_libre(self, lig, col):
         """ Renvoie True si la case est libre (ni mur, ni monstre) """
-        if lig < 0 or lig > self.hauteur or col < 0 or col > self.largeur or self.cases[
-                lig][col] == SYMBOLE_MUR:
+        if lig < 0 or lig > self.hauteur or col < 0 or col > self.largeur or ~(
+                self.cases[lig] & 1 << col) & 1 << col:
             return False
 
         for entity in self.entities:
