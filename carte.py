@@ -154,7 +154,7 @@ class Carte:
                         projectile.parent.gold += monstre.gold
                         self.entities.remove(monstre)
                         self.projectiles.remove(projectile)
-            if not self.case_libre(projectile.lig, projectile.col):
+            if ~(self.cases[projectile.lig] & 1 << projectile.col) & 1 << projectile.col:
                 self.projectiles.remove(projectile)
         for entity in self.entities:
             entity.update()

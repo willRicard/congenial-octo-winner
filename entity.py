@@ -4,6 +4,9 @@ from queue import PriorityQueue
 
 from rect import distance
 
+# @enum Direction parmi 8 possibles.
+# On utilise un masque pour pouvoir
+# se déplacer / tirer en diagonale.
 NORTH = 1
 SOUTH = 2
 WEST = 4
@@ -13,7 +16,6 @@ EAST = 8
 # pylint: disable=too-few-public-methods
 class Entity:
     """ Entité générique """
-
     def __init__(self, lig, col, facing=NORTH, vie=1, gold=10):
         self.lig = lig  # ordonnée
         self.col = col  # abscisse
