@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """ Affichage de la carte """
 import curses
-from carte import SYMBOLE_JOUEUR, SYMBOLE_SOL, SYMBOLE_MUR, SYMBOLE_MONSTRE, SYMBOLE_PROJECTILE
 from joueur import ALIMENT_POISON, ALIMENT_CURSE
 
 from monstre.rat import Rat
@@ -9,10 +8,15 @@ from monstre.monstre import Monstre
 
 from gfx.window import COLOR_RED, COLOR_GREEN, COLOR_BLUE, COLOR_MAGENTA, COLOR_GREEN_MAGENTA
 
+SYMBOLE_JOUEUR = '@'
+SYMBOLE_PROJECTILE = '*'
+SYMBOLE_SOL = '.'
+SYMBOLE_MUR = '#'
+SYMBOLE_MONSTRE = 'X'
+
 
 class VueCarte:
     """ Affichage de la carte """
-
     def __init__(self, carte, window):
         self.carte = carte
 
@@ -37,12 +41,10 @@ class VueCarte:
 
         for lig in range(carte.hauteur):
             for col in range(carte.largeur):
-                attr = curses.A_NORMAL
-                if carte.cases[lig][col] == SYMBOLE_MUR:
-                    attr = curses.A_REVERSE
-                if carte.cases[lig][col] == SYMBOLE_PROJECTILE:
-                    attr = curses.color_pair(COLOR_BLUE)
-                self.pad.addstr(lig, col, carte.cases[lig][col], attr)
+                if carte.cases[lig] & 1 << col:
+                    self.pad.addstr(lig, col, SYMBOLE_SOL)
+                else:
+                    self.pad.addstr(lig, col, SYMBOLE_MUR, curses.A_REVERSE)
 
         # Affichage des projectiles
         for projectile in carte.projectiles:

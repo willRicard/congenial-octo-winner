@@ -4,11 +4,12 @@
 
 class Rect:
     """ Rectangle 2D """
-    def __init__(self, left, top, width, height):
+    def __init__(self, left, top, width, height, depth=0):
         self.left = left
         self.top = top
         self.width = width
         self.height = height
+        self.depth = depth
 
         # précalculé car souvent utilisé
         self.point_centre = (self.left + self.width // 2,

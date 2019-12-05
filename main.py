@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """ Bases de la Programmation Impérative : Projet Python """
-import sys
 import os
 from random import seed, random
 from gettext import gettext, bindtextdomain
@@ -70,6 +69,7 @@ def main():
 
     carte = Carte(64, 128)
     carte.generer_salles()
+    carte.ajouter_monstres(prefs.difficulty)
 
     view = VueCarte(carte, window)
 
