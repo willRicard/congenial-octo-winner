@@ -5,25 +5,24 @@
 class Rect:
     """ Rectangle 2D """
     def __init__(self, left, top, width, height, depth=0):
+        """ Constructeur """
+        ## Abscisse du coin supérieur gauche
         self.left = left
+        ## Ordonnée du coin supérieur gauche
         self.top = top
+        ## Largeur
         self.width = width
+        ## Hauteur
         self.height = height
+        ## Profondeur de la salle
         self.depth = depth
 
-        # précalculé car souvent utilisé
+        ## Précalcul du centre
         self.point_centre = (self.left + self.width // 2,
                              self.top + self.height // 2)
 
-    def __str__(self):
-        return '({}, {}, {}, {})'.format(self.left, self.top, self.width,
-                                         self.height)
-
-    def __repr__(self):
-        return '({}, {}, {}, {})'.format(self.left, self.top, self.width,
-                                         self.height)
-
     def centre(self):
+        """ Retourne les coordonées du centre """
         return self.point_centre
 
     def bounds(self, other):
@@ -35,11 +34,8 @@ class Rect:
 
     def contains(self, x_point, y_point):
         """ Renvoie True si le point (:x_point:, :y_point:) appartient au rectangle """
-        return self.left <= x_point <= self.left + self.width and self.top <= y_point <= self.top + self.height
-
-
-def intersect(s1):
-    return lambda s2: s1.x - 1 < s2.x + s2.w + 1 and s2.x - 1 < s1.x + s1.w + 1 and s1.y - 1 < s2.y + s2.h + 1 and s2.y - 1 < s1.y + s1.h + 1
+        return self.left <= x_point <= self.left + self.width and (
+            self.top <= y_point <= self.top + self.height)
 
 
 def distance(lig1, col1, lig2, col2):

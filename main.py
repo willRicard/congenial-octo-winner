@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-""" Bases de la Programmation Impérative : Projet Python """
+"""@package pyhack
+Bases de la Programmation Impérative : Projet Python """
+
 import os
-from random import seed, random
+from random import seed
 from gettext import gettext, bindtextdomain
 
 from prefs import Preferences
 from carte import Carte
-from entity import NORTH, SOUTH, EAST, WEST
-from joueur import Joueur, ALIMENT_POISON, ALIMENT_CURSE
+from joueur import Joueur
 
 from gfx.window import Window
 from gfx.pref_dialog import PreferenceDialog
@@ -71,7 +72,7 @@ def main():
     carte.generer_salles()
     carte.ajouter_monstres(prefs.difficulty)
 
-    view = VueCarte(carte, window)
+    view = VueCarte(carte)
 
     depart = carte.salles[0]
     col, lig = depart.centre()
@@ -82,7 +83,7 @@ def main():
     view.center(joueur, window)
 
     while not window.should_close:
-        if joueur.vie == 0:
+        if joueur.vie < 0:
             window.dialog('Game over !')
             break
 

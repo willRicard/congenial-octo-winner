@@ -9,7 +9,7 @@ from gettext import gettext
 
 from entity import NORTH, SOUTH, WEST, EAST
 
-# @enum Couleur d'affichage
+## @enum Couleur d'affichage
 COLOR_RED = 1
 COLOR_BLUE = 2
 COLOR_YELLOW = 3
@@ -17,8 +17,8 @@ COLOR_GREEN = 4
 COLOR_MAGENTA = 5
 COLOR_GREEN_MAGENTA = 6
 
-FRAME_TIME = 1 / 15
-KEY_ESCAPE = 27
+FRAME_TIME = 1 / 15  # Durée (en s) d'un tour
+KEY_ESCAPE = 27  # Code ASCII touche ECHAP
 
 
 # pylint: disable=too-many-instance-attributes
@@ -28,6 +28,7 @@ class Window:
         """ Initialisation des ressources
         Le booléen :realtime: indique si on attend
         une action de l'utilisation pour rafraîchir """
+        ## Écran ncurses
         self.scr = curses.initscr()
         self.scr.keypad(True)
         curses.curs_set(0)
@@ -50,16 +51,28 @@ class Window:
         self.scr.clear()
         self.scr.refresh()
 
-        self.height, self.width = self.scr.getmaxyx()
+        height, width = self.scr.getmaxyx()
+        ## Nombre de colonnes
+        self.width = width
+        ## Nombre de lignes
+        self.height = height
 
+        ## Indique si le jeu attend une
+        # action du joueur avant de se mettre à jour
         self.realtime = False
-        self.last_frame = 0  # timestamp of the last frame
+        ## Timestamp of the last frame
+        self.last_frame = 0
 
+        ## Indique si la fenêtre doit se fermer
         self.should_close = False
+        ## Indique si la fenêtre vient d'être redimensionnée
         self.resized = False
+        ## Indique si on doit afficher l'éditeur de préférences
         self.open_preferences = False
 
+        ## Direction de déplacement
         self.moving = 0
+        ## Indique si le joueur doit tirer
         self.shooting = False
 
     def close(self):

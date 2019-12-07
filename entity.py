@@ -4,7 +4,7 @@ from queue import PriorityQueue
 
 from rect import distance
 
-# @enum Direction parmi 8 possibles.
+## @enum Direction parmi 8 possibles.
 # On utilise un masque pour pouvoir
 # se déplacer / tirer en diagonale.
 NORTH = 1
@@ -12,21 +12,36 @@ SOUTH = 2
 WEST = 4
 EAST = 8
 
+## @enum Altération d'état
+# Malus attribué aux joeurs/monstres
+ALIMENT_POISON = 1  # un joueur empoisonné perd progressivement des PV
+ALIMENT_CURSE = 2  # un joueur maudit perd progressivement des PM
 
-# pylint: disable=too-few-public-methods
+
+# pylint: disable=too-few-public-methods,too-many-arguments
 class Entity:
     """ Entité générique """
     def __init__(self, lig, col, facing=NORTH, vie=1, gold=10):
-        self.lig = lig  # ordonnée
-        self.col = col  # abscisse
-        self.vie = vie  # points de vie
-        self.max_vie = vie  # conservé pour l'affichage
+        """ Constructeur
+        Requiert des coordonées :lig:, :col: valides.
+        Requiert :vie: > 0."""
+        ## ordonnée
+        self.lig = lig
+        ## abscisse
+        self.col = col
+        ## points de vie
+        self.vie = vie
+        ## conservé pour l'affichage
+        self.max_vie = vie
+        ## pièces d'or
         self.gold = gold
+        ## altération d'état
         self.aliment = 0
+        ## direction regardée
         self.facing = facing
 
     def deplacer(self, carte, direction):
-        """ Se déplace sur la :carte: dans la :direction: """
+        """ Déplace l'entité sur la :carte: dans la :direction: """
         lig, col = self.lig, self.col
 
         if direction & NORTH:

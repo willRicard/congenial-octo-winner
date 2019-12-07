@@ -9,10 +9,15 @@ from entity import NORTH, SOUTH, EAST, WEST
 class Projectile:
     """ Projectile magique """
     def __init__(self, parent, lig, col, direction):
-        self.parent = parent  # joueur ou ennemi
-        self.lig = lig  # ordonnée
-        self.col = col  # abscisse
-        self.direction = direction  # direction de propagation
+        """ Constructeur """
+        ## joueur ou ennemi
+        self.parent = parent
+        ## ordonnée
+        self.lig = lig
+        ## abscisse
+        self.col = col
+        ## direction de propagation
+        self.direction = direction
 
     def update(self):
         """ Mise à jour """

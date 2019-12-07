@@ -18,15 +18,24 @@ EPAISSEUR_MUR = 1
 class Carte:
     """ Une carte de caractères """
     def __init__(self, hauteur=100, largeur=100):
+        """ Constructeur  """
+        ## nombre de lignes
         self.hauteur = hauteur
+        ## nombre de colonnes
         self.largeur = largeur
 
+        ## liste de lignes
+        # le i-eme bit d'une ligne indique
+        # si la case contient un mur (0) ou non (1)
         self.cases = [0 for lig in range(hauteur)]
 
+        ## liste de salles
         self.salles = []
 
+        ## liste des êtres vivants présents dans le donjons
         self.entities = []
 
+        ## liste de projectiles alliés et ennemis
         self.projectiles = []
 
     def relier(self, depart, arrivee):
@@ -123,15 +132,16 @@ class Carte:
     def ajouter_monstres(self, difficulte):
         """ Ajoute des monstres en tenant compte de la :difficulte: """
         num_monstres = [3, 2, 1]
-        # on ajoute pas de monstres dans la salle de départ
+        # on n'ajoute pas de monstres dans la salle de départ
         for salle in self.salles[1:]:
+            col, lig = salle.centre()
             for _ in range(num_monstres[salle.depth]):
-                col, lig = salle.centre()
                 col += randrange(0, 4)
                 lig += randrange(0, 4)
                 classe_monstre = choices([Rat, Goblin],
                                          weights=SPAWN_RATE[difficulte])[0]
-                self.entities.append(classe_monstre(self, lig, col))
+                monstre = classe_monstre(self, lig, col)
+                self.entities.append(monstre)
 
     def ajouter_projectile(self, joueur):
         """ Ajoute un projectile aux coordonnées :lig: :col: se déplaçant dans la :direction:
@@ -154,7 +164,8 @@ class Carte:
                         projectile.parent.gold += monstre.gold
                         self.entities.remove(monstre)
                         self.projectiles.remove(projectile)
-            if ~(self.cases[projectile.lig] & 1 << projectile.col) & 1 << projectile.col:
+            if ~(self.cases[projectile.lig]
+                 & 1 << projectile.col) & 1 << projectile.col:
                 self.projectiles.remove(projectile)
         for entity in self.entities:
             entity.update()

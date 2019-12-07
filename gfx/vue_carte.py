@@ -1,28 +1,38 @@
 # -*- coding: utf-8 -*-
 """ Affichage de la carte """
 import curses
-from joueur import ALIMENT_POISON, ALIMENT_CURSE
+
+from entity import ALIMENT_POISON, ALIMENT_CURSE
+from joueur import Joueur
 
 from monstre.rat import Rat
-from monstre.monstre import Monstre
+from monstre.goblin import Goblin
 
 from gfx.window import COLOR_RED, COLOR_GREEN, COLOR_BLUE, COLOR_MAGENTA, COLOR_GREEN_MAGENTA
 
-SYMBOLE_JOUEUR = '@'
-SYMBOLE_PROJECTILE = '*'
-SYMBOLE_SOL = '.'
-SYMBOLE_MUR = '#'
-SYMBOLE_MONSTRE = 'X'
+## @enum Symbole
+# Caractère utilisé pour l'affichage
+SYMBOLE_JOUEUR = '@'  # caractère affiché à la position des joueurs
+SYMBOLE_PROJECTILE = '*'  # caractère affiché à la position des projectiles
+SYMBOLE_SOL = '.'  # caractère affiché sur une case libre
+SYMBOLE_MUR = '#'  # caractère affichée sur une case occupée
+SYMBOLE_RAT = 'r'  # caractère affiché à la position des rats
+SYMBOLE_GOBLIN = 'X'  # caractère affiché à la poisition des goblins
 
 
 class VueCarte:
     """ Affichage de la carte """
-    def __init__(self, carte, window):
+    def __init__(self, carte):
+        """ Constructeur """
+        ## Référence vers la carte
         self.carte = carte
 
+        ## Fenêtre glissante pour l'affichage
         self.pad = curses.newpad(carte.hauteur + 1, carte.largeur + 1)
 
+        ## Ordonnée du coin supérieur gauche de la vue affichée
         self.lig_scroll = 0
+        ## Abscisse du coin supérieur gauche de la vue affichée
         self.col_scroll = 0
 
     def refresh(self, joueur, window):
@@ -31,14 +41,17 @@ class VueCarte:
         carte = self.carte
         if joueur.lig - self.lig_scroll <= 1 and self.lig_scroll > 0:
             self.lig_scroll -= 1
-        elif joueur.lig - self.lig_scroll >= window.height - 2 and self.lig_scroll <= carte.hauteur - window.height:
+        elif joueur.lig - self.lig_scroll >= window.height - 2 and (
+                self.lig_scroll <= carte.hauteur - window.height):
             self.lig_scroll += 1
 
         if joueur.col - self.col_scroll <= 1 and self.col_scroll > 0:
             self.col_scroll -= 1
-        elif joueur.col - self.col_scroll >= window.width - 2 and self.col_scroll <= carte.largeur - window.width:
+        elif joueur.col - self.col_scroll >= window.width - 2 and (
+                self.col_scroll <= carte.largeur - window.width):
             self.col_scroll += 1
 
+        # Affichage de la carte
         for lig in range(carte.hauteur):
             for col in range(carte.largeur):
                 if carte.cases[lig] & 1 << col:
@@ -51,34 +64,41 @@ class VueCarte:
             self.pad.addstr(projectile.lig, projectile.col, SYMBOLE_PROJECTILE,
                             curses.color_pair(COLOR_BLUE))
 
-        # Affichage des monstres
-        for entity in carte.entities:
-            symbole = ""
-            if isinstance(entity, Rat):
-                symbole = "r"
-            elif isinstance(entity, Monstre):
-                symbole = "X"
-
-            self.pad.addstr(entity.lig, entity.col, symbole,
-                            curses.color_pair(COLOR_RED))
-
-        # Affichage du joueur
-        attr = curses.A_REVERSE
-        if joueur.aliment == ALIMENT_POISON:
-            attr = curses.color_pair(COLOR_GREEN)
-        elif joueur.aliment == ALIMENT_CURSE:
-            attr = curses.color_pair(COLOR_MAGENTA)
-        elif joueur.aliment == ALIMENT_POISON | ALIMENT_CURSE:
-            attr = curses.color_pair(COLOR_GREEN_MAGENTA)
-
-        self.pad.addstr(joueur.lig, joueur.col, SYMBOLE_JOUEUR, attr)
+        self.draw_entities(carte.entities)
 
         # On laisse la derinière ligne pour l'ITH
-        try:
-            self.pad.refresh(self.lig_scroll, self.col_scroll, 0, 0,
-                             window.height - 2, window.width - 1)
-        except Exception:
-            pass
+        self.pad.refresh(self.lig_scroll, self.col_scroll, 0, 0,
+                         window.height - 2, window.width - 1)
+
+    def draw_entities(self, entities):
+        """ Affichage des monstres et des joueurs """
+        for entity in entities:
+            symbole = SYMBOLE_GOBLIN
+            attr = curses.A_NORMAL
+
+            if isinstance(entity, Rat):
+                symbole = SYMBOLE_RAT
+                attr |= curses.color_pair(COLOR_RED)
+            elif isinstance(entity, Goblin):
+                symbole = SYMBOLE_GOBLIN
+                attr |= curses.color_pair(COLOR_RED)
+            elif isinstance(entity, Joueur):
+                symbole = SYMBOLE_JOUEUR
+                attr |= curses.A_REVERSE
+
+            # Les altérations d'état
+            # modifient la couleur d'affichage
+            if entity.aliment == ALIMENT_POISON:
+                attr |= curses.color_pair(COLOR_GREEN)
+            elif entity.aliment == ALIMENT_CURSE:
+                attr |= curses.color_pair(COLOR_MAGENTA)
+            elif entity.aliment == ALIMENT_POISON | ALIMENT_CURSE:
+                attr |= curses.color_pair(COLOR_GREEN_MAGENTA)
+
+            try:
+                self.pad.addstr(entity.lig, entity.col, symbole, attr)
+            except curses.error:
+                pass
 
     def center(self, joueur, window):
         """ On centre l'écran sur le joueur """

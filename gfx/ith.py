@@ -7,16 +7,16 @@ from gettext import gettext
 
 from gfx.window import COLOR_RED, COLOR_BLUE, COLOR_YELLOW
 
-# @enum Mode d'affichage de l'ITH
+## @enum Mode d'affichage de l'ITH
 DISPLAY_MODE_NORMAL = 0
 DISPLAY_MODE_NO_TEXT = 1
 DISPLAY_MODE_ICON = 2
 
-# @enum Type de champ
+## @enum Type de champ
 FIELD_TYPE_NUMBER = 0  # un nombre
 FIELD_TYPE_QUOTIENT = 1  # un quotient: nombre/nombre
 
-# @enum Longueur du champ
+## @enum Longueur du champ
 NUMBER_FIELD_LENGTH = 3  # 3 chiffres max
 QUOTIENT_FIELD_LENGTH = 2 * NUMBER_FIELD_LENGTH + 1  # 2*3 chiffres max + 1 slash
 
@@ -29,8 +29,11 @@ class ITH:
     """ Affichage tête haute """
     def __init__(self, window, display_mode):
         """ Précalcul des positions où afficher les champs """
+        ## Fenêtre ncurses pour l'affichage
         self.win = curses.newwin(1, window.width, window.height - 1, 0)
+        ## Mode d'affichage
         self.display_mode = display_mode
+        ## Précalcul des positions des champs
         self.cols = [0] * len(ITH_FIELDS)
 
         # on n'affiche que les icônes si la fenêtre est trop petite
