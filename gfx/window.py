@@ -11,8 +11,8 @@ from pygame._sdl2 import messagebox
 
 from entity import NORTH, SOUTH, WEST, EAST
 
-FRAME_TIME = 1 / 15
-KEY_ESCAPE = 27
+FRAME_TIME = 1 / 15  # Durée (en s) d'un tour
+KEY_ESCAPE = 27  # Code ASCII touche ECHAP
 
 WINDOW_DEFAULT_WIDTH = 1000
 WINDOW_DEFAULT_HEIGHT = 800
@@ -42,14 +42,22 @@ class Window:
         self.width = WINDOW_DEFAULT_WIDTH
         self.height = WINDOW_DEFAULT_HEIGHT
 
+        ## Indique si le jeu attend une
+        # action du joueur avant de se mettre à jour
         self.realtime = False
-        self.last_frame = 0  # timestamp of the last frame
+        ## Timestamp of the last frame
+        self.last_frame = 0
 
+        ## Indique si la fenêtre doit se fermer
         self.should_close = False
+        ## Indique si la fenêtre vient d'être redimensionnée
         self.resized = False
+        ## Indique si on doit afficher l'éditeur de préférences
         self.open_preferences = False
 
+        ## Direction de déplacement
         self.moving = 0
+        ## Indique si le joueur doit tirer
         self.shooting = False
 
     def close(self):

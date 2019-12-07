@@ -6,7 +6,7 @@ import pygame as pg
 from joueur import ALIMENT_POISON, ALIMENT_CURSE
 
 from monstre.rat import Rat
-from monstre.monstre import Monstre
+from monstre.goblin import Goblin
 
 TILE_SIZE = 16
 
@@ -18,16 +18,21 @@ COLOR_MONSTRE = pg.Color(255, 0, 0)
 
 class VueCarte:
     """ Affichage de la carte """
-    def __init__(self, carte, window):
+    def __init__(self, carte):
+        """ Constructeur """
+        ## Référence vers la carte
         self.carte = carte
-        self.surface = pg.Surface((window.width, window.height))
+
+        self.surface = pg.Surface(pg.display.get_window_size())
 
         try:
             self.img_mage = pg.image.load("assets/mage.png")
         except pg.error:
             sys.exit(1)
 
+        ## Ordonnée du coin supérieur gauche de la vue affichée
         self.lig_scroll = 0
+        ## Abscisse du coin supérieur gauche de la vue affichée
         self.col_scroll = 0
 
     def refresh(self, joueur, window):
@@ -46,6 +51,7 @@ class VueCarte:
         elif joueur.col - self.col_scroll >= num_cols - 2 and self.col_scroll <= carte.largeur - num_cols:
             self.col_scroll -= 1
 
+        # Affichage de la carte
         for lig in range(carte.hauteur):
             for col in range(carte.largeur):
                 color = COLOR_MUR

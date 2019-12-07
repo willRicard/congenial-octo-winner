@@ -3,6 +3,8 @@
 from sys import stderr
 from gettext import gettext
 
+## @enum Difficulté
+# La difficulté influe sur le nombre et l'intelligence des monstres
 EASY = 0
 NORMAL = 1
 HARD = 2
@@ -13,8 +15,12 @@ class Preferences:
     def __init__(self, realtime=False, difficulty=NORMAL, ith=False):
         """ Initialise les préférences. Les champs non renseignés prennent
         les valeurs par défaut """
+        ## indique si le jeu
+        # attend une action du joueur avant de se mettre à jour
         self.realtime = realtime
+        ## la difficulté influe sur le nombre et le type des monstres
         self.difficulty = difficulty
+        ## type d'affichage pour l'ITH
         self.ith = ith
 
     def save(self, filename):

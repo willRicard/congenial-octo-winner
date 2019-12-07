@@ -3,11 +3,7 @@
 from entity import Entity
 from joueur import Joueur
 
-SPAWN_RATE = [
-    [1.0, 0.0],
-    [0.75, 0.25],
-    [0.0, 1.0]
-]
+SPAWN_RATE = [[1.0, 0.0], [0.75, 0.25], [0.0, 1.0]]
 
 
 # pylint: disable=too-few-public-methods
@@ -26,4 +22,5 @@ class Monstre(Entity):
                     self.attaquer(joueur)
 
     def attaquer(self, joueur):
+        """ Par défaut, on enlève un point de vie aux joueurs voisins """
         joueur.vie -= 1

@@ -6,12 +6,17 @@ from time import sleep
 
 from gfx.window import FRAME_TIME, KEY_ESCAPE
 
-PREF_DIALOG_START_LIG = 2  # Ligne où démarrer l'affichage des options. Doit être positive.
-PREF_DIALOG_START_COL = 3  # Colonne où démarrer l'affichage des options. Doit être positive.
-PREF_DIALOG_LIG_STEP = 2  # Espace entre deux options
+## Ligne où démarrer l'affichage des options. Doit être positive.
+PREF_DIALOG_START_LIG = 2
+## Colonne où démarrer l'affichage des options. Doit être positive.
+PREF_DIALOG_START_COL = 3
+## Espace entre deux options
+PREF_DIALOG_LIG_STEP = 2
 
-PREF_DIALOG_VERTICAL_PADDING = 7  # Marge verticale. Crash si < 7
-PREF_DIALOG_HORIZONTAL_PADDING = 16  # Marge horizontale. Crash si < 16
+## Marge verticale. Crash si < 7
+PREF_DIALOG_VERTICAL_PADDING = 7
+## Marge horizontale. Crash si < 16
+PREF_DIALOG_HORIZONTAL_PADDING = 16
 
 
 class PreferenceDialog:
@@ -19,6 +24,8 @@ class PreferenceDialog:
     Le constructeur peut lever curses.error et OSError
     """
     def __init__(self, prefs, window):
+        """ Constructeur """
+        ## Préférences à modifier
         self.prefs = prefs
 
         titres = [
@@ -27,6 +34,7 @@ class PreferenceDialog:
             gettext("Affichage tête-haute")
         ]
 
+        ## tableau 2d des champs affichés
         self.champs = [
             [gettext("Tour par tour"),
              gettext("Temps réel")],
@@ -37,12 +45,12 @@ class PreferenceDialog:
              gettext("Icônes"),
              gettext("Compact")]
         ]
+        ## Champ (ligne) sélectionné
         self.champ_sel = 0
-        self.choix = [0] * len(self.champs)
-        self.choix[0] = int(prefs.realtime)
-        self.choix[1] = prefs.difficulty
-        self.choix[2] = int(prefs.ith)
-        self.cols = []  # précalcul des positions pour chaque label
+        ## valeur (colonne) sélectionné
+        self.choix = [int(prefs.realtime), prefs.difficulty, int(prefs.ith)]
+        ## précalcul des positions pour chaque label
+        self.cols = []
 
         hauteur = 2 * len(self.champs) + PREF_DIALOG_VERTICAL_PADDING
         largeur = max([
@@ -51,6 +59,7 @@ class PreferenceDialog:
         ]) + PREF_DIALOG_HORIZONTAL_PADDING
 
         try:
+            ## Fenêtre ncurses pour l'affichage
             self.win = curses.newwin(hauteur, largeur,
                                      window.height // 2 - hauteur // 2,
                                      window.width // 2 - largeur // 2)

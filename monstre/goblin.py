@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
 """ Monstre """
-from entity import Entity, a_etoile, distance
+from entity import a_etoile, distance
 from joueur import Joueur
 
 from monstre.monstre import Monstre
 
+## Distance seuil pour abandonner la poursuite du joueur
 THRESHOLD_DISTANCE = 20
 
 
 # pylint: disable=too-few-public-methods
 class Goblin(Monstre):
-    """ Le goblin se déplace intelligemment """
+    """ Le goblin se déplace intelligemment vers le joueur """
     def __init__(self, carte, lig, col, vie=1):
-        super(Monstre, self).__init__(lig, col, vie)
+        """ Constructeur """
+        super(Goblin, self).__init__(lig, col, vie)
+        ## Conservé pour A*
         self.carte = carte
 
     def update(self):
@@ -30,7 +33,8 @@ class Goblin(Monstre):
                 if prochain != goal:
                     self.lig = prochain[0]
                     self.col = prochain[1]
-                    self.moved = True
 
     def attaquer(self, joueur):
+        """Le goblin n'est pas très fort et enlève au :joueur: un
+        seul point de vie """
         joueur.vie -= 1

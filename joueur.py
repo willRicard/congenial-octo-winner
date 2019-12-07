@@ -2,27 +2,33 @@
 """ Joueur """
 from random import random
 
-from entity import Entity
+from entity import Entity, ALIMENT_POISON, ALIMENT_CURSE
 
-BASE_VIE = 100
-BASE_MANA = 100
+## Points de vie max d'un joeur de niveau 1
+BASE_VIE = 100  
+## Points de magie max d'un joueur de niveau 1
+BASE_MANA = 100  
 
-# @enum Altération d'état
-ALIMENT_POISON = 1
-ALIMENT_CURSE = 2
 
-PROBA_RECOVER = 0.02
+## Probabilité de guérison spontanée d'un joueur empoisonné/maudit
+PROBA_RECOVER = 0.02  
 
 
 class Joueur(Entity):
     """ Joueur représenté par un @ """
     def __init__(self, lig, col):
+        """ Constructeur """
         super(Joueur, self).__init__(lig, col, vie=BASE_VIE)
 
-        self.mana = self.max_mana = BASE_MANA
+        ## Points de magie
+        self.mana = BASE_MANA  
+        ## Points de magie max
+        self.max_mana = BASE_MANA  
 
-        self.level = 1
-        self.exp = 0
+        ## Niveau
+        self.level = 1  
+        ## Expérience
+        self.exp = 0  
 
     def update(self):
         """ Met a jour l'etat du joueur suivant ses altérations d'état. """
@@ -35,7 +41,7 @@ class Joueur(Entity):
             self.aliment &= 0
 
     def level_up(self):
-        """ Augmente les attributs du joueur """
+        """ Améliore les attributs du joueur """
         self.max_vie += self.level
         self.vie = self.vie
 
