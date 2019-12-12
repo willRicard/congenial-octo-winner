@@ -45,6 +45,7 @@ class Entity:
 
     def deplacer(self, carte, direction):
         """ Déplace l'entité sur la :carte: dans la :direction: """
+        self.facing = direction
         lig, col = self.lig, self.col
 
         if direction & NORTH:
@@ -59,8 +60,6 @@ class Entity:
         if carte.case_libre(lig, col):
             self.lig = lig
             self.col = col
-
-            self.facing = direction
 
 
 def a_etoile(carte, start, goal):

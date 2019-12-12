@@ -5,13 +5,12 @@ from random import random
 from entity import Entity, ALIMENT_POISON, ALIMENT_CURSE
 
 ## Points de vie max d'un joeur de niveau 1
-BASE_VIE = 100  
+BASE_VIE = 100
 ## Points de magie max d'un joueur de niveau 1
-BASE_MANA = 100  
-
+BASE_MANA = 100
 
 ## Probabilité de guérison spontanée d'un joueur empoisonné/maudit
-PROBA_RECOVER = 0.02  
+PROBA_RECOVER = 0.02
 
 
 class Joueur(Entity):
@@ -21,14 +20,14 @@ class Joueur(Entity):
         super(Joueur, self).__init__(lig, col, vie=BASE_VIE)
 
         ## Points de magie
-        self.mana = BASE_MANA  
+        self.mana = BASE_MANA
         ## Points de magie max
-        self.max_mana = BASE_MANA  
+        self.max_mana = BASE_MANA
 
         ## Niveau
-        self.level = 1  
+        self.level = 1
         ## Expérience
-        self.exp = 0  
+        self.exp = 0
 
     def update(self):
         """ Met a jour l'etat du joueur suivant ses altérations d'état. """

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """ Bases de la Programmation Impérative : Projet Python """
-
 import os
 from gettext import gettext, bindtextdomain
 
@@ -58,7 +57,7 @@ def main():
 
     window = Window()
 
-    pref_file = os.path.join(os.getenv("HOME"), ".pyhack")
+    pref_file = os.path.join(os.getenv("HOME"), ".pyhack-ricardgu")
     try:
         prefs = charger_preferences(pref_file, window)
     except OSError as err:

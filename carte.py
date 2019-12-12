@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """ Tableau 2D de caractères """
-from sys import stderr
 from random import random, randrange, choice, choices
 
 from rect import Rect
@@ -24,6 +23,10 @@ EPAISSEUR_MUR = 1
 ## Distance délimitant le champ de vision
 # des joueurs
 VISIBILITY_DISTANCE = 8
+
+# Trois monstres dans une grande salle,
+# deux dans une moyenne etc.
+NUM_MONSTRES = [3, 2, 1]
 
 
 class Carte:
@@ -81,11 +84,13 @@ class Carte:
             # Haut gauche
             Rect(salle.left, salle.top, x_split, y_split, depth=depth),
             # Haut droite
-            Rect(salle.left + x_split + EPAISSEUR_MUR,
-                 salle.top,
-                 salle.width - x_split - 2 * EPAISSEUR_MUR,
-                 y_split,
-                 depth=depth),
+            Rect(
+                salle.left + x_split + EPAISSEUR_MUR,
+                salle.top,
+                salle.width - x_split -
+                2 * EPAISSEUR_MUR,  # un mur de chaque côté
+                y_split,
+                depth=depth),
             # Bas gauche
             Rect(salle.left,
                  salle.top + y_split + EPAISSEUR_MUR,
@@ -143,15 +148,19 @@ class Carte:
 
     def ajouter_monstres(self, difficulte):
         """ Ajoute des monstres en tenant compte de la :difficulte: """
-        # trois monstres dans une grande salle,
-        # deux dans une moyenne etc.
-        num_monstres = [3, 2, 1]
         # on n'ajoute pas de monstres dans la salle de départ
         for salle in self.salles[1:]:
             col, lig = salle.centre()
-            for _ in range(num_monstres[salle.depth]):
-                col += randrange(0, 2)
-                lig += randrange(0, 2)
+            num_monstres = 0
+            try:
+                num_monstres = NUM_MONSTRES[salle.depth]
+            except IndexError:
+                pass
+            for _ in range(num_monstres):
+                col += randrange(0, 4)
+                lig += randrange(0, 4)
+                assert 0 < lig < self.hauteur
+                assert 0 < col < self.largeur
                 classe_monstre = choices([Rat, Goblin],
                                          weights=SPAWN_RATE[difficulte])[0]
                 monstre = classe_monstre(self, lig, col)
@@ -211,7 +220,7 @@ class Carte:
 
     def case_libre(self, lig, col):
         """ Renvoie True si la case est libre (ni mur, ni monstre) """
-        if lig < 0 or lig > self.hauteur or col < 0 or col > self.largeur or self.est_mur(
+        if lig < 0 or lig >= self.hauteur or col < 0 or col >= self.largeur or self.est_mur(
                 lig, col):
             return False
 

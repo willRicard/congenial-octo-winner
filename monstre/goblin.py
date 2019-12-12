@@ -14,7 +14,7 @@ class Goblin(Monstre):
     """ Le goblin se déplace intelligemment vers le joueur """
     def __init__(self, carte, lig, col, vie=1):
         """ Constructeur """
-        super(Goblin, self).__init__(lig, col, vie)
+        super(Goblin, self).__init__(carte, lig, col, vie)
         ## Conservé pour A*
         self.carte = carte
 

@@ -96,17 +96,13 @@ class VueCarte:
                 continue
 
             symbole = SYMBOLE_GOBLIN
-            attr = curses.A_NORMAL
+            attr = curses.color_pair(COLOR_RED)
 
             if isinstance(entity, Rat):
                 symbole = SYMBOLE_RAT
-                attr |= curses.color_pair(COLOR_RED)
-            elif isinstance(entity, Goblin):
-                symbole = SYMBOLE_GOBLIN
-                attr |= curses.color_pair(COLOR_RED)
             elif isinstance(entity, Joueur):
                 symbole = SYMBOLE_JOUEUR
-                attr |= curses.A_REVERSE
+                attr = curses.A_REVERSE
 
             # Les altérations d'état
             # modifient la couleur d'affichage
@@ -117,10 +113,7 @@ class VueCarte:
             elif entity.aliment == ALIMENT_POISON | ALIMENT_CURSE:
                 attr |= curses.color_pair(COLOR_GREEN_MAGENTA)
 
-            try:
-                self.pad.addstr(entity.lig, entity.col, symbole, attr)
-            except curses.error:
-                pass
+            self.pad.addstr(entity.lig, entity.col, symbole, attr)
 
     def center(self, joueur, window):
         """ On centre l'écran sur le joueur """
