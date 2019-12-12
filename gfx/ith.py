@@ -8,17 +8,27 @@ from gettext import gettext
 from gfx.window import COLOR_RED, COLOR_BLUE, COLOR_YELLOW
 
 ## @enum Mode d'affichage de l'ITH
+
+## On affiche tout
 DISPLAY_MODE_NORMAL = 0
+## On n'affiche que les icônes la valeur
 DISPLAY_MODE_NO_TEXT = 1
+## On n'affiche que les icônes et le numérateur
 DISPLAY_MODE_ICON = 2
 
 ## @enum Type de champ
-FIELD_TYPE_NUMBER = 0  # un nombre
-FIELD_TYPE_QUOTIENT = 1  # un quotient: nombre/nombre
+
+## Un nombre
+FIELD_TYPE_NUMBER = 0
+## Un quotient ie. nombre/nombre
+FIELD_TYPE_QUOTIENT = 1
 
 ## @enum Longueur du champ
-NUMBER_FIELD_LENGTH = 3  # 3 chiffres max
-QUOTIENT_FIELD_LENGTH = 2 * NUMBER_FIELD_LENGTH + 1  # 2*3 chiffres max + 1 slash
+
+## 3 chiffres max
+NUMBER_FIELD_LENGTH = 3
+## 2*3 chiffres max + 1 slash
+QUOTIENT_FIELD_LENGTH = 2 * NUMBER_FIELD_LENGTH + 1
 
 ITH_FIELDS = [("❤︎", "Vie", FIELD_TYPE_QUOTIENT, COLOR_RED),
               ("*", "Mana", FIELD_TYPE_QUOTIENT, COLOR_BLUE),

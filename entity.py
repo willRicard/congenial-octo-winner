@@ -14,8 +14,11 @@ EAST = 8
 
 ## @enum Altération d'état
 # Malus attribué aux joeurs/monstres
-ALIMENT_POISON = 1  # un joueur empoisonné perd progressivement des PV
-ALIMENT_CURSE = 2  # un joueur maudit perd progressivement des PM
+
+## Un joueur empoisonné perd progressivement des PV
+ALIMENT_POISON = 1
+## Un joueur maudit perd progressivement des PM
+ALIMENT_CURSE = 2
 
 
 # pylint: disable=too-few-public-methods,too-many-arguments

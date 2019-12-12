@@ -17,8 +17,10 @@ COLOR_GREEN = 4
 COLOR_MAGENTA = 5
 COLOR_GREEN_MAGENTA = 6
 
-FRAME_TIME = 1 / 15  # Durée (en s) d'un tour
-KEY_ESCAPE = 27  # Code ASCII touche ECHAP
+## Durée (en s) d'un tour
+FRAME_TIME = 1 / 15
+## Code ASCII touche ECHAP
+KEY_ESCAPE = 27
 
 
 # pylint: disable=too-many-instance-attributes

@@ -12,12 +12,19 @@ from gfx.window import COLOR_RED, COLOR_GREEN, COLOR_BLUE, COLOR_MAGENTA, COLOR_
 
 ## @enum Symbole
 # Caractère utilisé pour l'affichage
-SYMBOLE_JOUEUR = '@'  # caractère affiché à la position des joueurs
-SYMBOLE_PROJECTILE = '*'  # caractère affiché à la position des projectiles
-SYMBOLE_SOL = '.'  # caractère affiché sur une case libre
-SYMBOLE_MUR = '#'  # caractère affichée sur une case occupée
-SYMBOLE_RAT = 'r'  # caractère affiché à la position des rats
-SYMBOLE_GOBLIN = 'X'  # caractère affiché à la poisition des goblins
+
+# Caractère affiché à la position des joueurs
+SYMBOLE_JOUEUR = '@'
+## Caractère affiché à la position des projectiles
+SYMBOLE_PROJECTILE = '*'
+## Caractère affiché sur une case libre
+SYMBOLE_SOL = '.'
+## Caractère affichée sur une case occupée
+SYMBOLE_MUR = '#'
+## Caractère affiché à la position des rats
+SYMBOLE_RAT = 'r'
+## Caractère affiché à la poisition des goblins
+SYMBOLE_GOBLIN = 'X'
 
 
 class VueCarte:
@@ -54,15 +61,26 @@ class VueCarte:
         # Affichage de la carte
         for lig in range(carte.hauteur):
             for col in range(carte.largeur):
-                if carte.cases[lig] & 1 << col:
-                    self.pad.addstr(lig, col, SYMBOLE_SOL)
-                else:
-                    self.pad.addstr(lig, col, SYMBOLE_MUR, curses.A_REVERSE)
+                # if carte.cases[lig] & 1 << col:
+                #     if carte.visible[lig] & 1 << col:
+                #         self.pad.addstr(lig, col, SYMBOLE_SOL)
+                #     else:
+                #         self.pad.addstr(lig, col, SYMBOLE_SOL, curses.A_REVERSE)
+                # else:
+                #     self.pad.addstr(lig, col, SYMBOLE_MUR)
+                if carte.visible[lig] & 1 << col:
+                    if carte.cases[lig] & 1 << col:
+                        self.pad.addstr(lig, col, SYMBOLE_SOL)
+                    else:
+                        self.pad.addstr(lig, col, SYMBOLE_MUR,
+                                        curses.A_REVERSE)
 
         # Affichage des projectiles
         for projectile in carte.projectiles:
-            self.pad.addstr(projectile.lig, projectile.col, SYMBOLE_PROJECTILE,
-                            curses.color_pair(COLOR_BLUE))
+            lig, col = projectile.lig, projectile.col
+            if self.carte.visible[lig] & 1 << col:
+                self.pad.addstr(lig, col, SYMBOLE_PROJECTILE,
+                                curses.color_pair(COLOR_BLUE))
 
         self.draw_entities(carte.entities)
 
@@ -73,6 +91,10 @@ class VueCarte:
     def draw_entities(self, entities):
         """ Affichage des monstres et des joueurs """
         for entity in entities:
+            lig, col = entity.lig, entity.col
+            if ~(self.carte.visible[lig] & 1 << col) & 1 << col:
+                continue
+
             symbole = SYMBOLE_GOBLIN
             attr = curses.A_NORMAL
 

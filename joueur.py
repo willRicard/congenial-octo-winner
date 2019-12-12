@@ -32,6 +32,8 @@ class Joueur(Entity):
 
     def update(self):
         """ Met a jour l'etat du joueur suivant ses altérations d'état. """
+        if self.mana < self.max_mana:
+            self.mana += 0.5
         if self.aliment & ALIMENT_POISON and random() < 0.2:
             self.vie -= 1
         if self.aliment & ALIMENT_CURSE and self.mana > 0 and random() < 0.2:

@@ -3,6 +3,8 @@
 from entity import Entity
 from joueur import Joueur
 
+## Taux d'apparition des monstres
+# selon la difficulté du jeu
 SPAWN_RATE = [[1.0, 0.0], [0.75, 0.25], [0.0, 1.0]]
 
 
