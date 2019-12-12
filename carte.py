@@ -9,10 +9,24 @@ from monstre.rat import Rat
 from monstre.goblin import Goblin
 from projectile import Projectile
 
+## Nombre de salles
 NUM_SALLES = 10
+## Probabilité de fermer un quart d'une salle
 PROBA_ARRET = 0.2
+## Probabilité de générer une grande salle
+# au lieu de quatre plus petites
 PROBA_GRANDE_SALLE = 0.2
+
+## Épaisseur des murs
 EPAISSEUR_MUR = 1
+
+## Distance délimitant le champ de vision
+# des joueurs
+VISIBILITY_DISTANCE = 8
+
+# Trois monstres dans une grande salle,
+# deux dans une moyenne etc.
+NUM_MONSTRES = [3, 2, 1]
 
 
 class Carte:
@@ -28,6 +42,7 @@ class Carte:
         # le i-eme bit d'une ligne indique
         # si la case contient un mur (0) ou non (1)
         self.cases = [0 for lig in range(hauteur)]
+        self.visible = [0 for lig in range(hauteur)]
 
         ## liste de salles
         self.salles = []
@@ -69,11 +84,13 @@ class Carte:
             # Haut gauche
             Rect(salle.left, salle.top, x_split, y_split, depth=depth),
             # Haut droite
-            Rect(salle.left + x_split + EPAISSEUR_MUR,
-                 salle.top,
-                 salle.width - x_split - 2 * EPAISSEUR_MUR,
-                 y_split,
-                 depth=depth),
+            Rect(
+                salle.left + x_split + EPAISSEUR_MUR,
+                salle.top,
+                salle.width - x_split -
+                2 * EPAISSEUR_MUR,  # un mur de chaque côté
+                y_split,
+                depth=depth),
             # Bas gauche
             Rect(salle.left,
                  salle.top + y_split + EPAISSEUR_MUR,
@@ -131,13 +148,19 @@ class Carte:
 
     def ajouter_monstres(self, difficulte):
         """ Ajoute des monstres en tenant compte de la :difficulte: """
-        num_monstres = [3, 2, 1]
         # on n'ajoute pas de monstres dans la salle de départ
         for salle in self.salles[1:]:
             col, lig = salle.centre()
-            for _ in range(num_monstres[salle.depth]):
+            num_monstres = 0
+            try:
+                num_monstres = NUM_MONSTRES[salle.depth]
+            except IndexError:
+                pass
+            for _ in range(num_monstres):
                 col += randrange(0, 4)
                 lig += randrange(0, 4)
+                assert 0 < lig < self.hauteur
+                assert 0 < col < self.largeur
                 classe_monstre = choices([Rat, Goblin],
                                          weights=SPAWN_RATE[difficulte])[0]
                 monstre = classe_monstre(self, lig, col)
@@ -164,16 +187,41 @@ class Carte:
                         projectile.parent.gold += monstre.gold
                         self.entities.remove(monstre)
                         self.projectiles.remove(projectile)
-            if ~(self.cases[projectile.lig]
-                 & 1 << projectile.col) & 1 << projectile.col:
+            if self.est_mur(projectile.lig, projectile.col):
                 self.projectiles.remove(projectile)
         for entity in self.entities:
             entity.update()
 
+    def update_visible(self, joueur):
+        """ Met à jour le champ de vision du :joueur: """
+        for lig_case, col_case in self.champ_vision(joueur.lig, joueur.col):
+            if self.est_mur(lig_case, col_case):
+                self.visible[lig_case] |= 1 << col_case
+                continue
+
+            case_visible = True
+
+            delta_lig = lig_case - joueur.lig
+            delta_col = col_case - joueur.col
+            distance = max(abs(delta_lig), abs(delta_col))
+            for i in range(distance):
+                lig = int(joueur.lig + i / distance * delta_lig)
+                col = int(joueur.col + i / distance * delta_col)
+                if self.est_mur(lig, col):
+                    case_visible = False
+                    break
+
+            if case_visible:
+                self.visible[lig_case] |= 1 << col_case
+
+    def est_mur(self, lig, col):
+        """Renvoie :True: si la case (:lig:, :col:) est un mur"""
+        return ~(self.cases[lig] & 1 << col) & 1 << col
+
     def case_libre(self, lig, col):
         """ Renvoie True si la case est libre (ni mur, ni monstre) """
-        if lig < 0 or lig > self.hauteur or col < 0 or col > self.largeur or ~(
-                self.cases[lig] & 1 << col) & 1 << col:
+        if lig < 0 or lig >= self.hauteur or col < 0 or col >= self.largeur or self.est_mur(
+                lig, col):
             return False
 
         for entity in self.entities:
@@ -188,3 +236,14 @@ class Carte:
                                        (lig, col + 1), (lig + 1, col)]:
             if self.case_libre(lig_voisin, col_voisin):
                 yield (lig_voisin, col_voisin)
+
+    def champ_vision(self, lig_centre, col_centre):
+        """ Itère sur les cases visibles depuis (:lig_centre:, :col_centre:) """
+        for lig in range(max(0, lig_centre - VISIBILITY_DISTANCE),
+                         min(self.hauteur, lig_centre + VISIBILITY_DISTANCE)):
+            for col in range(
+                    max(0, col_centre - VISIBILITY_DISTANCE + 1),
+                    min(self.largeur, col_centre + VISIBILITY_DISTANCE)):
+                if (lig - lig_centre)**2 + (
+                        col - col_centre)**2 <= VISIBILITY_DISTANCE**2:
+                    yield (lig, col)

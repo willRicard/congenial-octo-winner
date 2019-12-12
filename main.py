@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""@package pyhack
-Bases de la Programmation Impérative : Projet Python """
-
+""" Bases de la Programmation Impérative : Projet Python """
 import os
-from random import seed
 from gettext import gettext, bindtextdomain
 
 from prefs import Preferences
@@ -16,6 +13,7 @@ from gfx.pref_dialog import PreferenceDialog
 from gfx.vue_carte import VueCarte
 from gfx.ith import ITH
 
+## Texte affiché à l'ouverture du jeu
 INTRO_TEXTE = "Bienvenue, aventurier !\n\
 Vous avez parcouru un long chemin pour arriver ici en quête de gloire.\n\
 Vous entrez maintenant dans les donjons d'Eneladim.\n\n\
@@ -24,6 +22,8 @@ Appuyez sur 'p' pour éditer vos préférences.\n\n\
 Appuyez sur Échap. pour quitter.\n\
 Appuyez sur Entrée pour continuer."
 
+## Texte affiché en cas d'erreur au niveau
+# du système de fichiers
 ERREUR_TEXTE = "Impossible de lire/écrire vos préférences depuis {}\
 Vérifiez vos permissions !\n{}"
 
@@ -52,12 +52,12 @@ def update_preferences(prefs, path, window):
 
 def main():
     """ Point d'entrée du programme """
-    seed(0)
+    # chargement des messages traduits
     bindtextdomain("messages", ".")
 
     window = Window()
 
-    pref_file = os.path.join(os.getenv("HOME"), ".pyhack")
+    pref_file = os.path.join(os.getenv("HOME"), ".pyhack-ricardgu")
     try:
         prefs = charger_preferences(pref_file, window)
     except OSError as err:
@@ -81,6 +81,7 @@ def main():
     ith = ITH(window, prefs.ith)
 
     while not window.should_close:
+        carte.update_visible(joueur)
         if joueur.vie < 0:
             window.dialog('Game over !')
             break
@@ -92,7 +93,7 @@ def main():
         window.refresh()
 
         if window.resized:
-            view = VueCarte(carte, window)
+            view = VueCarte(carte)
             view.refresh(joueur, window)
             ith = ITH(window, prefs.ith)
             ith.refresh(joueur)

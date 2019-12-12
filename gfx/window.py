@@ -11,8 +11,10 @@ from pygame._sdl2 import messagebox
 
 from entity import NORTH, SOUTH, WEST, EAST
 
-FRAME_TIME = 1 / 15  # Durée (en s) d'un tour
-KEY_ESCAPE = 27  # Code ASCII touche ECHAP
+## Durée (en s) d'un tour
+FRAME_TIME = 1 / 15
+## Code ASCII touche ECHAP
+KEY_ESCAPE = 27
 
 WINDOW_DEFAULT_WIDTH = 1000
 WINDOW_DEFAULT_HEIGHT = 800

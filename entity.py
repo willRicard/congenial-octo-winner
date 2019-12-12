@@ -14,8 +14,11 @@ EAST = 8
 
 ## @enum Altération d'état
 # Malus attribué aux joeurs/monstres
-ALIMENT_POISON = 1  # un joueur empoisonné perd progressivement des PV
-ALIMENT_CURSE = 2  # un joueur maudit perd progressivement des PM
+
+## Un joueur empoisonné perd progressivement des PV
+ALIMENT_POISON = 1
+## Un joueur maudit perd progressivement des PM
+ALIMENT_CURSE = 2
 
 
 # pylint: disable=too-few-public-methods,too-many-arguments
@@ -42,6 +45,7 @@ class Entity:
 
     def deplacer(self, carte, direction):
         """ Déplace l'entité sur la :carte: dans la :direction: """
+        self.facing = direction
         lig, col = self.lig, self.col
 
         if direction & NORTH:
@@ -56,8 +60,6 @@ class Entity:
         if carte.case_libre(lig, col):
             self.lig = lig
             self.col = col
-
-            self.facing = direction
 
 
 def a_etoile(carte, start, goal):
