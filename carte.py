@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """ Tableau 2D de caractères """
+from math import sqrt
 from random import random, randrange, choice, choices
 
 from rect import Rect
@@ -239,11 +240,14 @@ class Carte:
 
     def champ_vision(self, lig_centre, col_centre):
         """ Itère sur les cases visibles depuis (:lig_centre:, :col_centre:) """
-        for lig in range(max(0, lig_centre - VISIBILITY_DISTANCE),
-                         min(self.hauteur, lig_centre + VISIBILITY_DISTANCE)):
-            for col in range(
-                    max(0, col_centre - VISIBILITY_DISTANCE + 1),
-                    min(self.largeur, col_centre + VISIBILITY_DISTANCE)):
-                if (lig - lig_centre)**2 + (
-                        col - col_centre)**2 <= VISIBILITY_DISTANCE**2:
-                    yield (lig, col)
+        haut = max(0, lig_centre - VISIBILITY_DISTANCE)
+        bas = min(self.hauteur, lig_centre + VISIBILITY_DISTANCE)
+        for lig in range(haut, bas):
+            delta_lig = lig - lig_centre
+            delta_col = int(
+                sqrt(VISIBILITY_DISTANCE * VISIBILITY_DISTANCE -
+                     delta_lig * delta_lig))
+            gauche = max(0, col_centre - delta_col)
+            droite = min(self.largeur, col_centre + delta_col)
+            for col in range(gauche, droite):
+                yield (lig, col)

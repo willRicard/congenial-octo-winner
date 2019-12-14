@@ -59,15 +59,11 @@ class VueCarte:
             self.col_scroll += 1
 
         # Affichage de la carte
-        for lig in range(carte.hauteur):
-            for col in range(carte.largeur):
-                # if carte.cases[lig] & 1 << col:
-                #     if carte.visible[lig] & 1 << col:
-                #         self.pad.addstr(lig, col, SYMBOLE_SOL)
-                #     else:
-                #         self.pad.addstr(lig, col, SYMBOLE_SOL, curses.A_REVERSE)
-                # else:
-                #     self.pad.addstr(lig, col, SYMBOLE_MUR)
+        for lig in range(self.lig_scroll,
+                         min(self.lig_scroll + window.height, carte.hauteur)):
+            for col in range(
+                    self.col_scroll,
+                    min(self.col_scroll + window.width, carte.largeur)):
                 if carte.visible[lig] & 1 << col:
                     if carte.cases[lig] & 1 << col:
                         self.pad.addstr(lig, col, SYMBOLE_SOL)
@@ -117,5 +113,5 @@ class VueCarte:
 
     def center(self, joueur, window):
         """ On centre l'écran sur le joueur """
-        self.lig_scroll = joueur.lig - window.height // 2
-        self.col_scroll = joueur.col - window.width // 2
+        self.lig_scroll = max(0, joueur.lig - window.height // 2)
+        self.col_scroll = max(0, joueur.col - window.width // 2)
