@@ -5,10 +5,11 @@ import pygame as pg
 
 from joueur import ALIMENT_POISON, ALIMENT_CURSE
 
+from monstre.monstre import Monstre
 from monstre.rat import Rat
 from monstre.goblin import Goblin
 
-TILE_SIZE = 16
+TILE_SIZE = 32
 
 COLOR_SOL = pg.Color(18, 18, 18)
 COLOR_MUR = pg.Color(33, 33, 33)
@@ -23,10 +24,13 @@ class VueCarte:
         ## Référence vers la carte
         self.carte = carte
 
-        self.surface = pg.Surface(pg.display.get_window_size())
+        self.surface = pg.Surface(
+            (carte.largeur * TILE_SIZE, carte.hauteur * TILE_SIZE))
 
         try:
             self.img_mage = pg.image.load("assets/mage.png")
+            self.img_rat = pg.image.load("assets/rat.png")
+            self.img_goblin = pg.image.load("assets/goblin.png")
         except pg.error:
             sys.exit(1)
 
@@ -47,9 +51,9 @@ class VueCarte:
             self.lig_scroll += 1
 
         if joueur.col - self.col_scroll <= 1 and self.col_scroll > 0:
-            self.col_scroll += 1
-        elif joueur.col - self.col_scroll >= num_cols - 2 and self.col_scroll <= carte.largeur - num_cols:
             self.col_scroll -= 1
+        elif joueur.col - self.col_scroll >= num_cols - 2 and self.col_scroll <= carte.largeur - num_cols:
+            self.col_scroll += 1
 
         # Affichage de la carte
         for lig in range(carte.hauteur):
@@ -69,22 +73,23 @@ class VueCarte:
                 pg.Rect(projectile.col * TILE_SIZE, projectile.lig * TILE_SIZE,
                         TILE_SIZE, TILE_SIZE))
 
-        # Affichage des monstres
+        # Affichage des monstres et du joueur
         for entity in carte.entities:
-            pg.draw.rect(
-                self.surface, COLOR_MONSTRE,
+            img = self.img_mage
+
+            if isinstance(entity, Rat):
+                img = self.img_rat
+            if isinstance(entity, Goblin):
+                img = self.img_goblin
+
+            self.surface.blit(
+                img,
                 pg.Rect(entity.col * TILE_SIZE, entity.lig * TILE_SIZE,
                         TILE_SIZE, TILE_SIZE))
 
-        # Affichage du joueur
-        self.surface.blit(
-            self.img_mage,
-            pg.Rect(joueur.col * TILE_SIZE, joueur.lig * TILE_SIZE, TILE_SIZE,
-                    TILE_SIZE))
-
         pg.display.get_surface().blit(
             self.surface,
-            pg.Rect(self.col_scroll * TILE_SIZE, self.lig_scroll * TILE_SIZE,
+            pg.Rect(-self.col_scroll * TILE_SIZE, -self.lig_scroll * TILE_SIZE,
                     num_cols * TILE_SIZE, num_lines * TILE_SIZE))
 
     def center(self, joueur, window):

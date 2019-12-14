@@ -74,6 +74,7 @@ class Window:
     def refresh(self):
         """ Gestion des événements """
         pg.display.flip()
+        # pg.display.get_surface().fill(pg.Color(0, 0, 0))
 
         self.moving = 0
         self.shooting = False
